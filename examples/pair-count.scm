@@ -1,5 +1,5 @@
 ;
-; count-agent.scm -- Agent that performs word-pair counting.
+; pair-count.scm -- Example demo of assembling a word-pair counter.
 ;
 ; Prototype hand-built agent capable of counting things observed
 ; in the external environment.
@@ -11,9 +11,6 @@
 ; The dataflow pipeline is hand-crafted. (The sensory API is supposed
 ; to eventually auto-build these pipelines, but that code is not working
 ; yet.) You'll notice that the pipeline below is ... complicated.
-;
-; Most of the demo is in the `examples/pair-count.scm` file. The below
-; is a condensation of that demo into it's working core.
 ;
 ; The "rest of the demo", where we do something with the word pairs,
 ; is in "generate.scm".
@@ -104,6 +101,34 @@
 )
 
 ; --------------------------------------------------------------
+; Demo wrapper showing how to use the above: Parse a string.
+; PLAIN-TEXT should be a scheme string.
+;
+; Verify this works as follows:
+;    (obs-txt "this is a test")
+;    (cog-report-counts)
+; Note the abundance of WordNodes listed in the report.
+;    (cog-get-atoms 'WordNode)
+; Cleanup after use:
+;    (for-each cog-extract-recursive! (cog-get-atoms 'WordNode))
+;    (extract-type 'WordNode)
+(define (obs-txt PLAIN-TEXT)
+
+	; We don't need to create this over and over; once is enough.
+	(define txt-stream (ValueOf (Concept "foo") (Predicate "some place")))
+	(define parser (make-parser txt-stream))
+
+	(define phrali (Phrase PLAIN-TEXT))
+	(cog-set-value! (Concept "foo") (Predicate "some place") phrali)
+
+	(cog-execute! parser)
+
+	; Remove the phrase-link, return the list of edges.
+	(cog-set-value! (Concept "foo") (Predicate "some place") #f)
+	(cog-extract-recursive! phrali)
+)
+
+; --------------------------------------------------------------
 ; Demo wrapper: Parse contents of a file.
 (define (obs-file FILE-NAME)
 
@@ -131,3 +156,38 @@
 )
 
 ; --------------------------
+; Issues.
+; Parses arrive as LinkValues. We want to apply a function to each.
+; How? Need:
+; 4) IncrementLink just like cog-inc-value!
+;    or is it enough to do atomic lock?
+;    Make SetValue exec under lock. ... easier said than done.
+;    risks deadlock.
+;
+; cog-update-value calls
+; Ideally, call asp->increment_count(h, key, fvp->value()));
+
+; Below works but is a non-atomic increment.
+(define ed (Edge (Bond "ANY") (List (Word "words") (Word "know"))))
+(define (doinc)
+	(cog-execute!
+		(SetValue ed (Predicate "count")
+			(Plus (Number 0 0 1)
+				(FloatValueOf ed (Predicate "count") (Number 0 0 0))))))
+
+; Here's a demo of what file-access looks like.
+(cog-execute!
+   (SetValue (Concept "foo") (Predicate "some place")
+      (FileRead "file:///tmp/demo.txt")))
+
+; Wait ...
+(define txt-stream-gen
+	(ValueOf (Concept "foo") (Predicate "some place")))
+
+; (cog-execute! (LgParseBonds txt-stream-gen DICT NUML))
+
+; (load "count-agent.scm")
+; (obs-txt "Some kind of sentence to process, hell yeah!")
+; (obs-file "/tmp/demo.txt")
+; (cog-report-counts)
+; (cog-get-atoms 'WordNode)

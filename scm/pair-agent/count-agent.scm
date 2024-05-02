@@ -77,7 +77,7 @@
 	(define (parseli phrali)
 		(PureExecLink (LgParseBonds phrali DICT NUML)))
 
-	; Given an Atom `phrali` hold text to be parsed, get that text,
+	; Given an Atom `phrali` holding text to be parsed, get that text,
 	; parse it, and increment the counts on the edges.
 	(define (filty phrali)
 		(Filter
@@ -100,7 +100,18 @@
 	(filty txt-stream)
 )
 
-; Demo wrapper: Parse a string.
+; --------------------------------------------------------------
+; Demo wrapper showing how to use the above: Parse a string.
+; PLAIN-TEXT should be a scheme string.
+;
+; Verify this works as follows:
+;    (obs-txt "this is a test")
+;    (cog-report-counts)
+; Note the abundance of WordNodes listed in the report.
+;    (cog-get-atoms 'WordNode)
+; Cleanup after use:
+;    (for-each cog-extract-recursive! (cog-get-atoms 'WordNode))
+;    (extract-type 'WordNode)
 (define (obs-txt PLAIN-TEXT)
 
 	; We don't need to create this over and over; once is enough.
@@ -113,9 +124,11 @@
 	(cog-execute! parser)
 
 	; Remove the phrase-link, return the list of edges.
+	(cog-set-value! (Concept "foo") (Predicate "some place") #f)
 	(cog-extract-recursive! phrali)
 )
 
+; --------------------------------------------------------------
 ; Demo wrapper: Parse contents of a file.
 (define (obs-file FILE-NAME)
 

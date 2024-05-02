@@ -176,7 +176,7 @@
 				(Glob "$stuff"))
 
 			; Output
-			(Glob "$stuff"))
+			(debug-prt (Glob "$ftuff")))
 
 		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
 

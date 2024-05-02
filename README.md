@@ -3,7 +3,7 @@ Atomese Agents
 Experiments and prototyping for interactive learning agents.
 
 ### Status
-Version 0.0.0 -- Extremely early prototyping stage.
+Version 0.0.1 -- Extremely early prototyping stage.
 
 ### Overview
 The [Opencog Learn](https://github.com/opencog/learn) project showed
@@ -46,3 +46,15 @@ Background reading: the various PDF and LyX files located at:
 
 Additional general details and concepts are described in scattershot
 locations, in diary entries, or nowhere at all.
+
+### Action-Perception
+The demos here are built on top of the perception-action framework
+developed in the [Sensory project](https://github.com/opencog/sensory).
+The code here adds some non-trivial processing steps on top of the
+basic sensori-motor API provided there. Be sure to go through the
+examples there.
+
+For examples in this project, see the [examples](./examples) directory
+here.
+
+--------------

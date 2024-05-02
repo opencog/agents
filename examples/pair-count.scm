@@ -1,20 +1,16 @@
 ;
 ; pair-count.scm -- Example demo of assembling a word-pair counter.
 ;
-; Prototype hand-built agent capable of counting things observed
-; in the external environment.
+; The generic goal is to be able to observe the external world, and to
+; then count things that "happen at the same time". The demo here counts
+; word pairs, observed to occur in sentences obtained from a text file.
 ;
-; Demos counting of word-pairs observed by looking at a text file.
-; The Sensory API allows easy generalization to other text sources,
-; so working with files is OK for now.
+; The demo builds up a processing pipeline, step by step, verifying that
+; everythig works at each stage. The result is a carefully-crafted
+; counting pipeline. An eventual goal of the sensory project is to
+; auto-generate these kinds of pipelines. This demo is meant to
+; illustrate a non-trivial pipeline.
 ;
-; The dataflow pipeline is hand-crafted. (The sensory API is supposed
-; to eventually auto-build these pipelines, but that code is not working
-; yet.) You'll notice that the pipeline below is ... complicated.
-;
-; The "rest of the demo", where we do something with the word pairs,
-; is in "generate.scm".
-
 (use-modules (opencog) (opencog exec) (opencog persist))
 (use-modules (opencog nlp) (opencog nlp lg-parse))
 (use-modules (opencog sensory))

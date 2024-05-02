@@ -26,7 +26,7 @@ subset of all possible edges. This will be called the "focus set" or the
 iterated and sorted into high-to-low MI order. This provides a weighted
 distribution, from which a rescaled uniform-random choice can be made.
 
-2) Random sample N out of full incomng set.
+2) Random sample N out of full incoming set.
 
 
 Lets steam-process this: Query returns list of edges

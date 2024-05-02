@@ -9,7 +9,7 @@
 ;    This source blocks if there's nothing to be read; else it
 ;    returns the next PhraseNode. The SRFI's call this a generator.
 ;    For now, see `sensory.scm` module and example.
-;    It uses a FileReadNode to loop voer a text file.
+;    It uses a FileReadNode to loop over a text file.
 ; 2) (Optional) Some way to split one source into multiple sources.
 ;    Maybe this:
 ;    https://wiki.opencog.org/w/PromiseLink#Multiplex_Example
@@ -29,7 +29,7 @@
 ; The below demos this design.
 ;
 ; Open issues:
-; *) Need to call cog-execute! in a loop to loop over whole file.
+; *) Need to call cog-execute! in a loop, to loop over whole file.
 ;    Would be nicer to not have to do this.
 ; *) End-of-file results in a throw from parser. This is a side
 ;    effect. We need some proper end-of-file handling.
@@ -137,15 +137,11 @@
 	(define txt-stream (ValueOf (Concept "foo") (Predicate "some place")))
 	(define parser (make-parser txt-stream))
 
-	(define phrali (FileRead (string-append "file://" FILE-NAME)))
+	(define phrali (Open (Type 'TextFileStream)
+		(Sensory (string-append "file://" FILE-NAME))))
 
-	; This will do the trick to set the value. Except it creates an Atom
-	; (cog-execute!
-	;    (SetValue (Concept "foo") (Predicate "some place")
-	;       (FileRead "file:///tmp/demo.txt")))
-	; Same as bove, without creating Atom.
-	(cog-set-value! (Concept "foo") (Predicate "some place")
-		(cog-execute! phrali))
+	(cog-execute!
+		(SetValue (Concept "foo") (Predicate "some place") phrali))
 
 	; Parse only first line of file:
 	; (cog-execute! parser)

@@ -50,7 +50,67 @@
 ; that cruft might be confusing.
 
 ; --------------------------------------------------------------
-; Next ...
+; Some philosophy:
+; The filters and pipelines in the rest of this demo would be easy to
+; create, if one was writing in pure scheme. Or, heck, even Python:
+; there are Python wrappers into the AtomSpace.  But that's not the
+; point.  The goal here is to do it in Atomese, so that the processing
+; pipeline is stored in the AtomSpace, as Atomese, where other agents
+; can examine it, work with it, modify it, hook it up, etc.
+;
+; For these demos, all of this hooking-up is purely manual. The sensory
+; project (in https://github.com/opencog/sensory) aims to automate all
+; of that; it's not quite ready and is still under construction.
+;
+; For debugging the demos here, we need a printer that can be called
+; from Atomese. So here's how to call back into scheme from Atomese.
+; This works for python, too.
+
+; Call some arbitrary scheme function, and pass two arguments:
+(define exo
+	(ExecutionOutput
+		(GroundedSchema "scm: foo")               ; the function
+		(List (Concept "bar") (Concept "baz"))))  ; the arguments
+
+(define (foo x y)
+	(format #t "I got ~A and ~A\n" x y)
+	(Concept "this is the foo reply"))
+
+; Run it and see.
+(cog-execute! exo)
+
+; Now, define the utility printer we actually need:
+(define (print-atom x) (format #t "Got ~A" x))
+
+(define (debug-prt x)
+	(ExecutionOutput
+		(GroundedSchema "scm: print-atom")
+		(List x)))
+
+; --------------------------------------------------------------
+; Create a filter that will extract just the edges from the compund
+; stream demoed above. This filter will ignore the list of words,
+; and will iterate over the list of edges.
+;
+
+(define edge-filter
+	(Filter
+		(Rule
+			; Type decl
+			(Glob "$x")
+			; Match clause - one per parse.
+			(LinkSignature
+				(Type 'LinkValue) ; the wrapper for the pair
+				(Type 'LinkValue) ; the word-list
+				(LinkSignature    ; the edge-list
+					(Type 'LinkValue)  ; edge-list wrapper
+					(Glob "$edge-list")))      ; all of the edges
+			; Pipeline to apply to the resulting match.
+			(count-edges (Glob "$edge-list"))
+		)
+		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
+
+(cog-execute! edge-filter)
 
 ; --------------------------------------------------------------
 ; This demo starts where the `file-read.scm` demo in the sensory

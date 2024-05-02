@@ -17,6 +17,50 @@
 (use-modules (srfi srfi-1))
 
 ; --------------------------------------------------------------
+; The Link Grammar "any" dictionary will parse a text string using
+; a uniformly-dsitributed random planar graph. That is, it will
+; generate random word-pair links, arranged so that no edges intersect.
+; Lets try it.
+
+(cog-execute!
+	(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1)))
+
+; The `(Number 1)` says that only one parse is wanted.
+; Note how a bunch of Edges flew by; these specify the word pairs.
+; Note how the list of edges is wrapped by a `LinkValue`.
+; Note how a list of words is generated, before the edges; it is also
+; wrapped in a LinkValue. The graph, as a whole, consisting of a list of
+; vertexes (the words) and edges, is wrapped in a LinkValue.
+
+; View the contents of the AtomSpace:
+(cog-report-counts)
+
+; View the list of words in the AtomSpace:
+(cog-get-atoms 'WordNode)
+
+; Remove the words and edges:
+(for-each cog-extract-recursive! (cog-get-atoms 'WordNode))
+
+; Equivalently:
+(extract-type 'WordNode)
+
+; The only reason to remove is to start with a clean slate, as the demo
+; progresses. Otherwise, it's OK to let things stay as they are.
+; Assorted cruft will build up in the AtomSpace as the demo progresses,
+; that cruft might be confusing.
+
+; --------------------------------------------------------------
+; Next ...
+
+; --------------------------------------------------------------
+; This demo starts where the `file-read.scm` demo in the sensory
+; project leaves off. See
+; https://github.com/opencog/sensory/raw/master/examples/file-read.scm
+
+
+
+
+; --------------------------------------------------------------
 ; Return a text parser that counts edges on a stream. The
 ; `txt-stream` must be an Atom that can serve as a source of text.
 ; Typically, `txt-stream` will be

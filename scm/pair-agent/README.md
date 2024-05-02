@@ -1,6 +1,58 @@
+Text processing agent
+---------------------
+***Design goal***: Agent that reads text and responds, by generating text.
+
+***Prototype***: Read text files, count word pairs, and generate
+high-ranked word-pair streams. The pair-counting agent is in
+`pair-agent.scm` and the generator is in `generator.scm`.
+
+***Motivation***: Word-pairs stand in for generic complex networks of
+occurances in the sensory environment that correlate with agent internal
+state. The agent sees and responds to the environment. The generation
+stream is a stand-in for generic agent motor control: after seeing and
+"thinking", the agent "responds" with "actions" out into the external
+environment.
 
 ## Pair counting agent
-Prototyping for a more agential approach.
+Prototype proof of concept. Implemented in `pair-agent.scm`.
+Counts word-pairs, observed by looking at a text file. The Sensory API
+(implemented in `(use-modules (opencog sensory))`) is general enough to
+allow arbitrary text sources, including chat.
 
-Some prototype sketches and notes.
-Nothing works here yet.
+The dataflow pipeline is hand-crafted. The sensory API is supposed to
+eventually auto-build these pipelines, but that code is not working yet.
+
+### Design Notes
+Here's the design we want for the pair-counting agent:
+
+1) Some source of text strings. This source blocks if there's
+   nothing to be read; else it returns the next string. The SRFI's
+   call this a generator. The `OpenLink` provided by `sensory.scm`
+   provides exactly this, so we're good.
+2) (Optional) Some way to split one source into multiple sources.
+   Maybe this:
+   https://wiki.opencog.org/w/PromiseLink#Multiplex_Example
+    but what happens if the readers don't both read ???
+3) A Filter that takes above and increments pair counts.
+   Done. Its non-atomic, but so what. Perhaps we can live with
+   that, given that sampling is statistical, anyway.
+4) Execution control. There are two choices:
+
+   ***Pull***: infinite loop polls on promise. Source blocks if
+         no input.
+   ***Push***: Nothing happens until source triggers; then a cascade
+         of effects downstream.
+   - Right now, the general infrastructure supports Pull naturally.
+   - There aren't any push demos.
+   - Attention control is easier with Pull.
+
+### TODO/Open issues
+Some unresolved issues.
+* Parser wants strings as `Node`s; it would be nice to be able to work
+  with `StringValue`.
+* Need to call `cog-execute!` in a loop, to loop over whole file. Would
+  be nicer to not have to do this. This is a bug; the `OutputStream`
+  class does run an inf loop on streams, but that loop fails on things
+  that have a `Filter` in the middle.
+* End-of-file results in a throw from parser. This is a side effect.
+  The throw should happen from the file-reader, directly.

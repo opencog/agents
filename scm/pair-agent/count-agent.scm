@@ -4,9 +4,9 @@
 ; Prototype hand-built agent capable of counting things observed
 ; in the external environment.
 ;
-; Currently, this demos counting of word-pairs observed by looking at
-; a text file. (The Sensory API should allow easy generalization to
-; other text sources.)
+; Demos counting of word-pairs observed by looking at a text file.
+; The Sensory API allows easy generalization to other text sources,
+; so working with files is OK for now.
 ;
 ; The dataflow pipeline is hand-crafted. (The sensory API is supposed
 ; to eventually auto-build these pipelines, but that code is not working
@@ -19,37 +19,6 @@
 (use-modules (opencog nlp) (opencog nlp lg-parse))
 (use-modules (opencog sensory))
 (use-modules (srfi srfi-1))
-
-; Here's the design we want:
-; 1) Some source of text strings. This source blocks if there's
-;    nothing to be read; else it returns the next string. The SRFI's
-;    call this a generator. The `OpenLink` provided by `sensory.scm`
-;    is a suitable source.
-; 1a) TODO... Parser wants strings as Nodes; it would be nice to
-;    be able to work with StringValue.
-; 2) (Optional) Some way to split one source into multiple sources.
-;    Maybe this:
-;    https://wiki.opencog.org/w/PromiseLink#Multiplex_Example
-;    but what happens if the readers don't both read ???
-; 3) A Filter that takes above and increments pair counts.
-;    Done. Its non-atomic, but so what. Perhaps we can live with
-;    that, given that sampliing is statistical, anyway.
-; 4) Execution control. There are two choices:
-;    Pull: infinite loop polls on promise. Source blocks if
-;          no input.
-;    Push: Nothing happens until source triggers; then a cascade
-;          of effects downstream.
-;    Right now, the general infrastructure supports Pull naturally.
-;    There aren't any push demos.
-;    Attention control is easier with Pull.
-;
-; The below demos this design.
-;
-; Open issues:
-; *) Need to call cog-execute! in a loop, to loop over whole file.
-;    Would be nicer to not have to do this.
-; *) End-of-file results in a throw from parser. This is a side
-;    effect. We need some proper end-of-file handling.
 
 ; --------------------------------------------------------------
 ; Return a text parser that counts edges on a stream. The

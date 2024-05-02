@@ -1,3 +1,19 @@
+;
+; count-agent.scm
+;
+; Prototype hand-built agent capable of counting things observed
+; in the external environment.
+;
+; Currently, this demos counting of word-pairs observed by looking at
+; a text file. (The Sensory API should allow easy generalization to
+; other text sources.)
+;
+; The dataflow pipeline is hand-crafted. (The sensory API is supposed
+; to eventually auto-build these pipelines, but that code is not working
+; yet.) You'll notice that the pipeline below is ... complicated.
+;
+; The "rest of the demo", where we do something with the word pairs,
+; is in "generate.scm".
 
 (use-modules (opencog) (opencog exec) (opencog persist))
 (use-modules (opencog nlp) (opencog nlp lg-parse))
@@ -5,11 +21,12 @@
 (use-modules (srfi srfi-1))
 
 ; Here's the design we want:
-; 1) Some source of text strings; actually a source of PhraseNode's
-;    This source blocks if there's nothing to be read; else it
-;    returns the next PhraseNode. The SRFI's call this a generator.
-;    For now, see `sensory.scm` module and example.
-;    It uses a FileReadNode to loop over a text file.
+; 1) Some source of text strings. This source blocks if there's
+;    nothing to be read; else it returns the next string. The SRFI's
+;    call this a generator. The `OpenLink` provided by `sensory.scm`
+;    is a suitable source.
+; 1a) TODO... Parser wants strings as Nodes; it would be nice to
+;    be able to work with StringValue.
 ; 2) (Optional) Some way to split one source into multiple sources.
 ;    Maybe this:
 ;    https://wiki.opencog.org/w/PromiseLink#Multiplex_Example

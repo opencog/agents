@@ -15,6 +15,7 @@ environment.
 
 ## Pair counting agent
 Prototype proof of concept. Implemented in `pair-agent.scm`.
+Based on demo in `examples/pair-count.scm`, which explains it in detail.
 Counts word-pairs, observed by looking at a text file. The Sensory API
 (implemented in `(use-modules (opencog sensory))`) is general enough to
 allow arbitrary text sources, including chat.
@@ -56,3 +57,10 @@ Some unresolved issues.
   that have a `Filter` in the middle.
 * End-of-file results in a throw from parser. This is a side effect.
   The throw should happen from the file-reader, directly.
+* Update AtomSpace to support an atomic `IncrementLink`. Under the
+  covers, this would call `asp->increment_count(h, key, fvp->value()));`
+  So it has the form `(IncrementLink atom key incr zero)` where `incr`
+  is, for example `(Number 0 0 1)` and `zero` is `(Number 0 0 0)`. Note
+  that this resembles a generic fold. The alternative to this is a
+  `AtomicSetValueLink` which holds a lock to make sure the update is
+  atomic. The risk is that naive users will discover deadlocks. Hmmm.

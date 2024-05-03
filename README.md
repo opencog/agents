@@ -3,7 +3,7 @@ Atomese Agents
 Experiments and prototyping for interactive learning agents.
 
 ### Status
-Version 0.0.1 -- Extremely early prototyping stage.
+Version 0.0.2 -- Extremely early prototyping stage.
 
 ### Overview
 The [Opencog Learn](https://github.com/opencog/learn) project showed

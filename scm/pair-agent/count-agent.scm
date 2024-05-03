@@ -65,21 +65,25 @@
 	(define (atom-counter ATOM-LIST)
 		(Filter
 			(Rule
-				(Variable "$edge")
-				(Variable "$edge")
-				(incr-cnt (Variable "$edge")))
+				; We could type for safety, but seems like no need...
+				; (TypedVariable (Variable "$atom")
+				;       (TypeChoice (Type 'Edge) (Type 'Word)))
+				(Variable "$atom") ; vardecl
+				(Variable "$atom") ; body to match
+				(incr-cnt (Variable "$atom")))
 			ATOM-LIST))
 
-	; Given PASRC holding a stream of parses, filter out the edges,
-	; and then applu function FUNKY to each edge.
-	(define (edge-filter PASRC FUNKY)
+	; Given PASRC holding a stream of parses, split it into a list of
+	; words, and a list of edges, and apply FUNKY to both lists.
+	(define (stream-splitter PASRC FUNKY)
 		(Filter
 			(Rule
 				(LinkSignature
 					(Type 'LinkValue)
-					(Variable "$words")
+					(Variable "$word-list")
 					(Variable "$edge-list"))
 				; Apply the function FUNKY to the edge-list
+				(FUNKY (Variable "$word-list"))
 				(FUNKY (Variable "$edge-list")))
 			PASRC))
 
@@ -88,8 +92,10 @@
 	; Is there any benefit to private parsing?
 	; (edge-filter (PureExecLink parser) edge-counter)
 
-	; Return the parser.
-	(edge-filter parser atom-counter)
+	; Return the assembled counting pipeline.
+	; All that the user needs to do is to call `cog-execute!` on it,
+	; until end of file is reached.
+	(stream-splitter parser atom-counter)
 )
 
 ; --------------------------------------------------------------
@@ -113,7 +119,7 @@
 	; Loop over all lines.
 	(define (looper) (cog-execute! parser) (looper))
 
-	; At end of file, exception will be thrown. Catch it.
+	; At end of file, exception will be thrown. Catch it. Print it.
 	(catch #t looper
 		(lambda (key . args) (format #t "The end ~A\n" key)))
 
@@ -127,6 +133,9 @@
 ; Look at results
 ; (cog-report-counts)
 ; (cog-execute! (ValueOf (Word "is") (Predicate "count")))
+; (cog-execute! (ValueOf
+;     (Edge (Bond "ANY") (List (Word "is") (Word "a")))
+;     (Predicate "count")))
 ;
 ; Erase all words, so we can try again.
 ; (extract-type 'WordNode)

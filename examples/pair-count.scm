@@ -173,8 +173,15 @@
 (cog-execute! demo-filter)
 
 ; Same as above, but this time, ignore the words, and get the edges.
-; Also, apply the function FUNKY to the edge-list. This will be a handy
-; place to wire in further processing.
+; Also, apply the function FUNKY to the edge-list.
+; This function is meant to be a handy place to wire in more processing,
+;
+; Note that the result of parsing appears to be double-wrapped in
+; LinkValue. The reason becomes more apparent if one asks for more
+; than just one parse: the outer LinkValue groups all of the parses,
+; while the inner one groups the edges in one parse. Thus, the
+; function FUNKY will be called once per parse, and its argument
+; will be the list of words in that parse.
 (define (edge-filter FUNKY)
 	(Filter
 		(Rule
@@ -201,7 +208,9 @@
 (define (incr-cnt edge)
 	(SetValue edge (Predicate "count")
 		(Plus (Number 0 0 1)
-			(FloatValueOf edge (Predicate "count") (FloatValueOf (Number 0 0 0))))))
+			(FloatValueOf edge (Predicate "count")
+				; The all-zeros provides an initial value, if not set.
+				(FloatValueOf (Number 0 0 0))))))
 
 ; Try it:
 (cog-execute! (incr-cnt (Concept "foobar")))
@@ -213,21 +222,18 @@
 ; ... or, equivalently, in Atomese:
 (cog-execute! (ValueOf (Concept "foobar") (Predicate "count")))
 
-; Wire it into the earlier pipelines
-(define (edge-counter ITEM)
+; Use the previous utility function to wire the counter into
+; the parsing pipeline.
+(define (edge-counter EDGE-LIST)
 	(Filter
 		(Rule
-			; (TypedVariable (Variable "$edge") (Type 'Edge))
-			(LinkSignature
-				(Type 'LinkValue)
+			(TypedVariable (Variable "$edge") (Type 'Edge))
 			(Variable "$edge")
-)
-			(debug-prt (Variable "$edge")))
-		ITEM))
+			(incr-cnt (Variable "$edge")))
+		EDGE-LIST))
 
-			; (incr-cnt (Variable "$edge")))
+; Run it. Watch the counts increment
 (cog-execute! (edge-filter edge-counter))
-(cog-execute! (edge-filter debug-prt))
 
 
 ; --------------------------------------------------------------

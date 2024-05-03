@@ -79,13 +79,12 @@
 ; Run it and see.
 (cog-execute! exo)
 
-; Now, define the utility printer we actually need:
-(define (print-atom x) (format #t "Got ~A" x))
+; Now, define the utility printer we actually need.
+; Use `x` as the return value, so that the printer is just a pass-thru.
+(define (print-atom x) (format #t "Got ~A" x) x)
 
 (define (debug-prt x)
-	(ExecutionOutput
-		(GroundedSchema "scm: print-atom")
-		(List x)))
+	(ExecutionOutput (GroundedSchema "scm: print-atom") x))
 
 ; --------------------------------------------------------------
 ; Create a filter that will extract just the edges from the compound
@@ -166,24 +165,31 @@
 ; Run it.
 (cog-execute! demo-filter)
 
-;Pair
-(define demo-filter
+; Extracting the desired components is easier if a printer is used for
+; debugging. This allows the innards of the match clause to be viewed
+; directly.
+(define word-filter
 	(Filter
 		(Rule
 			; Match clause - one per parse.
+			; The LinkValue wraps two more: one holding the words
+			; in the sentence, and another holding the word-pairs.
 			(LinkSignature
 				(Type 'LinkValue)
-				(Glob "$stuff"))
+				(LinkSignature
+					(Type 'LinkValue)  ; This matches the word-list
+					(Glob "$words"))
+				(Type 'LinkValue))    ; This matches the edge-list
 
-			; Output
-			(debug-prt (Glob "$ftuff")))
+			; Output clause
+			(debug-prt (Glob "$words")))
 
 		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
 
 ; Run it.
-(cog-execute! demo-filter)
+(cog-execute! word-filter)
 
-
+; Same as above, but this time, ignore the words, and get the edges.
 (define edge-filter
 	(Filter
 		(Rule

@@ -53,22 +53,22 @@
 	(define NUML (Number 4))
 	(define DICT (LgDict "any"))
 
-	; Increment the count on one edge.
-	(define (incr-cnt edge)
-		(SetValue edge (Predicate "count")
+	; Increment the count on one atom.
+	(define (incr-cnt atom)
+		(SetValue atom (Predicate "count")
 			(Plus (Number 0 0 1)
-				(FloatValueOf edge (Predicate "count")
+				(FloatValueOf atom (Predicate "count")
 					(FloatValueOf (Number 0 0 0))))))
 
-	; Given a list (an Atomese LinkValue list) of parse results,
-	; extract the edges and increment the count on them.
-	(define (edge-counter EDGE-LIST)
+	; Given a list (an Atomese LinkValue list) of Atoms,
+	; increment the count on each Atom.
+	(define (atom-counter ATOM-LIST)
 		(Filter
 			(Rule
-				(TypedVariable (Variable "$edge") (Type 'Edge))
+				(Variable "$edge")
 				(Variable "$edge")
 				(incr-cnt (Variable "$edge")))
-			EDGE-LIST))
+			ATOM-LIST))
 
 	; Given PASRC holding a stream of parses, filter out the edges,
 	; and then applu function FUNKY to each edge.
@@ -89,7 +89,7 @@
 	; (edge-filter (PureExecLink parser) edge-counter)
 
 	; Return the parser.
-	(edge-filter parser edge-counter)
+	(edge-filter parser atom-counter)
 )
 
 ; --------------------------------------------------------------

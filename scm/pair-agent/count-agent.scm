@@ -130,7 +130,7 @@
 ; Run the above demo:
 ; (obs-file "/tmp/demo.txt")
 ;
-; Look at results
+; Look at results. Poke around, look at counts.
 ; (cog-report-counts)
 ; (cog-execute! (ValueOf (Word "is") (Predicate "count")))
 ; (cog-execute! (ValueOf

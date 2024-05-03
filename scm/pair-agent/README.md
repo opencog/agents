@@ -14,7 +14,7 @@ stream is a stand-in for generic agent motor control: after seeing and
 environment.
 
 ## Pair counting agent
-Prototype proof of concept. Implemented in `pair-agent.scm`.
+Prototype proof of concept. Implemented in `pair-agent.scm`. Works.
 Based on demo in `examples/pair-count.scm`, which explains it in detail.
 Counts word-pairs, observed by looking at a text file. The Sensory API
 (implemented in `(use-modules (opencog sensory))`) is general enough to
@@ -22,6 +22,8 @@ allow arbitrary text sources, including chat.
 
 The dataflow pipeline is hand-crafted. The sensory API is supposed to
 eventually auto-build these pipelines, but that code is not working yet.
+
+The hand-crafted pipe works fine. Try it.
 
 ### Design Notes
 Here's the design we want for the pair-counting agent:

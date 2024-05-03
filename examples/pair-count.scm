@@ -14,9 +14,9 @@
 ; The steps proceed as follows:
 ; 1) Example of using the Link Grammar parser to generate word-pairs.
 ; 2) A debug printing utility.
-; 3) Using filters to extract subelements of a data stream.
+; 3) Using filters to extract sub-elements of a data stream.
 ; 4) Using filters to increment counts on elements of a data stream.
-; 5) Reading text from a file.
+; 5) Reading text from a file, and running it through the pipe.
 ;
 (use-modules (opencog) (opencog exec) (opencog persist))
 (use-modules (opencog nlp) (opencog nlp lg-parse))
@@ -283,6 +283,13 @@
 
 ; That's it. Now wire it all together:
 (cog-execute! (edge-filter parse-stream edge-counter))
+
+; If end-of-file is hit while experimenting, rest to the begining,
+; be re-opening the file:
+(cog-execute!
+	(SetValue (Anchor "pipe demo") (Predicate "text src")
+		(Open (Type 'TextFileStream)
+			(Sensory "file:///tmp/demo.txt"))))
 
 ; Note the actual flow is different from the how this is written, above.
 ; First, the parse stream flows to the edge-filter, and then the

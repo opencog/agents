@@ -83,15 +83,13 @@
 				(FUNKY (Variable "$edge-list")))
 			PASRC))
 
-	; Parse text in a private space.
-	(define (priv-parse TXT-SRC)
-		(PureExecLink (LgParseBonds TXT-SRC DICT NUML)))
+	(define parser (LgParseBonds txt-stream DICT NUML))
 
-	; I dunno. Is private parsing needed?
-	(define (regular-parse TXT-SRC) (LgParseBonds TXT-SRC DICT NUML))
+	; Is there any benefit to private parsing?
+	; (edge-filter (PureExecLink parser) edge-counter)
 
 	; Return the parser.
-	(edge-filter edge-counter (regular-parse txt-stream))
+	(edge-filter parser edge-counter)
 )
 
 ; --------------------------------------------------------------
@@ -121,5 +119,16 @@
 
 	(cog-extract-recursive! phrali)
 )
+
+; --------------------------
+; Run the above demo:
+; (obs-file "/tmp/demo.txt")
+;
+; Look at results
+; (cog-report-counts)
+; (cog-execute! (ValueOf (Word "is") (Predicate "count")))
+;
+; Erase all words, so we can try again.
+; (extract-type 'WordNode)
 
 ; --------------------------

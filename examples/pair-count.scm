@@ -11,6 +11,12 @@
 ; auto-generate these kinds of pipelines. This demo is meant to
 ; illustrate a non-trivial pipeline.
 ;
+; The steps proceed as follows:
+; 1) Example of using the Link Grammar parser to generate word-pairs.
+; 2) A debug printing utility.
+; 3) Using filters to extract subelements of a data stream.
+; 4) Using filters to increment counts on elements of a data stream.
+;
 (use-modules (opencog) (opencog exec) (opencog persist))
 (use-modules (opencog nlp) (opencog nlp lg-parse))
 (use-modules (opencog sensory))
@@ -168,7 +174,7 @@
 ; Extracting the desired components is easier if a printer is used for
 ; debugging. This allows the innards of the match clause to be viewed
 ; directly.
-(define word-filter
+(define demo-word-filter
 	(Filter
 		(Rule
 			; Match clause - one per parse.
@@ -187,10 +193,12 @@
 		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
 
 ; Run it.
-(cog-execute! word-filter)
+(cog-execute! demo-word-filter)
 
 ; Same as above, but this time, ignore the words, and get the edges.
-(define edge-filter
+; Also, replace the printer function with a generic function FUNKY.
+; This is a handy place to wire in further processing.
+(define (edge-filter FUNKY)
 	(Filter
 		(Rule
 			; Match clause - one per parse.
@@ -200,13 +208,53 @@
 				(LinkSignature    ; the edge-list
 					(Type 'LinkValue)  ; edge-list wrapper
 					(Glob "$edge-list")))      ; all of the edges
-			; Pipeline to apply to the resulting match.
-			(debug-prt (Glob "$edge-list"))
+			; Apply the functin FUNKY to the edge-list
+			(FUNKY (Glob "$edge-list"))
 		)
 		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
 
-(cog-execute! edge-filter)
+; Try it!
 
+(cog-execute! (edge-filter debug-prt))
+
+; --------------------------------------------------------------
+; The above showed hoe to pull out the edges from the parse stream.
+; The next goal is to increment the count on the edges, whenever they
+; are witnessed.
+
+; A handy-dandy counter utility.
+(define (incr-cnt edge)
+	(SetValue edge (Predicate "count")
+		(Plus (Number 0 0 1)
+			(FloatValueOf edge (Predicate "count") (FloatValueOf (Number 0 0 0))))))
+
+; Try it:
+(cog-execute! (incr-cnt (Concept "foobar")))
+
+; The count is stored at the key (Predicate "count").
+; It can be viewed directly with scheme:
+(cog-value (Concept "foobar") (Predicate "count"))
+
+; ... or, equivalently, in Atomese:
+(cog-execute! (ValueOf (Concept "foobar") (Predicate "count")))
+
+; Wire it into the earlier pipelines
+(define edge-counter
+	(Filter
+		(Rule
+			; (TypedVariable (Variable "$edge") (Type 'Edge))
+			(LinkSignature
+				(TypeNode 'LinkValue)
+				(Glob "$edge"))
+			(debug-prt (Glob "$edge")))
+			; (incr-cnt (Variable "$edge")))
+		edge-filter))
+
+(cog-execute! edge-counter)
+
+; --------------------------------------------------------------
+; --------------------------------------------------------------
+; --------------------------------------------------------------
 ; --------------------------------------------------------------
 ; This demo starts where the `file-read.scm` demo in the sensory
 ; project leaves off. See

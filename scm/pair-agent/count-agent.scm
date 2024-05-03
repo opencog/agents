@@ -1,19 +1,13 @@
 ;
 ; count-agent.scm -- Agent that performs word-pair counting.
 ;
-; Prototype hand-built agent capable of counting things observed
-; in the external environment.
-;
-; Demos counting of word-pairs observed by looking at a text file.
-; The Sensory API allows easy generalization to other text sources,
-; so working with files is OK for now.
+; Prototype hand-built agent capable of counting things observed in
+; the external environment. Based on the `pair-count.scm` demo in the
+; examples directory.
 ;
 ; The dataflow pipeline is hand-crafted. (The sensory API is supposed
 ; to eventually auto-build these pipelines, but that code is not working
-; yet.) You'll notice that the pipeline below is ... complicated.
-;
-; Most of the demo is in the `examples/pair-count.scm` file. The below
-; is a condensation of that demo into it's working core.
+; yet.)
 ;
 ; The "rest of the demo", where we do something with the word pairs,
 ; is in "generate.scm".
@@ -63,44 +57,41 @@
 	(define (incr-cnt edge)
 		(SetValue edge (Predicate "count")
 			(Plus (Number 0 0 1)
-				(FloatValueOf edge (Predicate "count") (FloatValueOf (Number 0 0 0))))))
+				(FloatValueOf edge (Predicate "count")
+					(FloatValueOf (Number 0 0 0))))))
 
 	; Given a list (an Atomese LinkValue list) of parse results,
 	; extract the edges and increment the count on them.
-	(define (count-edges parsed-stuff)
+	(define (edge-counter EDGE-LIST)
 		(Filter
 			(Rule
-				; (Variable "$edge")
 				(TypedVariable (Variable "$edge") (Type 'Edge))
 				(Variable "$edge")
 				(incr-cnt (Variable "$edge")))
-			parsed-stuff))
+			EDGE-LIST))
 
-	; Parse text in a private space.
-	(define (parseli phrali)
-		(PureExecLink (LgParseBonds phrali DICT NUML)))
-
-	; Given an Atom `phrali` holding text to be parsed, get that text,
-	; parse it, and increment the counts on the edges.
-	(define (filty phrali)
+	; Given PASRC holding a stream of parses, filter out the edges,
+	; and then applu function FUNKY to each edge.
+	(define (edge-filter PASRC FUNKY)
 		(Filter
 			(Rule
-				; Type decl
-				(Glob "$x")
-				; Match clause - one per parse.
 				(LinkSignature
-					(Type 'LinkValue) ; the wrapper for the pair
-					(Type 'LinkValue) ; the word-list
-					(LinkSignature    ; the edge-list
-						(Type 'LinkValue)  ; edge-list wrapper
-						(Glob "$edge-list")))      ; all of the edges
-				; Pipeline to apply to the resulting match.
-				(count-edges (Glob "$edge-list"))
-			)
-			(parseli phrali)))
+					(Type 'LinkValue)
+					(Variable "$words")
+					(Variable "$edge-list"))
+				; Apply the function FUNKY to the edge-list
+				(FUNKY (Variable "$edge-list")))
+			PASRC))
+
+	; Parse text in a private space.
+	(define (priv-parse TXT-SRC)
+		(PureExecLink (LgParseBonds TXT-SRC DICT NUML)))
+
+	; I dunno. Is private parsing needed?
+	(define (regular-parse TXT-SRC) (LgParseBonds TXT-SRC DICT NUML))
 
 	; Return the parser.
-	(filty txt-stream)
+	(edge-filter edge-counter (regular-parse txt-stream))
 )
 
 ; --------------------------------------------------------------
@@ -108,14 +99,15 @@
 (define (obs-file FILE-NAME)
 
 	; We don't need to create this over and over; once is enough.
-	(define txt-stream (ValueOf (Concept "foo") (Predicate "some place")))
+	(define txt-stream
+		(ValueOf (Anchor "parse pipe") (Predicate "text src")))
 	(define parser (make-parser txt-stream))
 
 	(define phrali (Open (Type 'TextFileStream)
 		(Sensory (string-append "file://" FILE-NAME))))
 
 	(cog-execute!
-		(SetValue (Concept "foo") (Predicate "some place") phrali))
+		(SetValue (Anchor "parse pipe") (Predicate "text src") phrali))
 
 	; Parse only first line of file:
 	; (cog-execute! parser)

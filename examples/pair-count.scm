@@ -16,6 +16,7 @@
 ; 2) A debug printing utility.
 ; 3) Using filters to extract subelements of a data stream.
 ; 4) Using filters to increment counts on elements of a data stream.
+; 5) Reading text from a file.
 ;
 (use-modules (opencog) (opencog exec) (opencog persist))
 (use-modules (opencog nlp) (opencog nlp lg-parse))
@@ -182,7 +183,9 @@
 (cog-execute! demo-filter)
 
 ; Same as above, but this time, ignore the words, and get the edges.
-; Also, apply the function FUNKY to the edge-list.
+; Write it as a pipeline component, with two arguments: a parse source
+; PASRC, so we don't have to keep working with the same sentence over
+; and over, and a function FUNKY that will be applied to the edge-list.
 ; This function is meant to be a handy place to wire in more processing,
 ;
 ; Note that the result of parsing appears to be double-wrapped in
@@ -191,7 +194,7 @@
 ; while the inner one groups the edges in one parse. Thus, the
 ; function FUNKY will be called once per parse, and its argument
 ; will be the list of words in that parse.
-(define (edge-filter FUNKY)
+(define (edge-filter PASRC FUNKY)
 	(Filter
 		(Rule
 			; Match clause - one per parse.
@@ -200,16 +203,18 @@
 				(Variable "$words")
 				(Variable "$edge-list"))
 
-			; Apply the functin FUNKY to the edge-list
-			(FUNKY (Variable "$edge-list"))
-		)
-		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
+			; Apply the function FUNKY to the edge-list
+			(FUNKY (Variable "$edge-list")))
+		PASRC))
+
+(define parse-stuff
+	(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1)))
 
 ; Try it! Use the debug printer as the function to call.
-(cog-execute! (edge-filter debug-prt))
+(cog-execute! (edge-filter parse-stuff debug-prt))
 
 ; --------------------------------------------------------------
-; The above showed hoe to pull out the edges from the parse stream.
+; The above showed how to pull out the edges from the parse stream.
 ; The next goal is to increment the count on the edges, whenever they
 ; are witnessed.
 
@@ -244,19 +249,40 @@
 		EDGE-LIST))
 
 ; Run it. Watch the counts increment
-(cog-execute! (edge-filter edge-counter))
+(cog-execute! (edge-filter parse-stuff edge-counter))
 
-
 ; --------------------------------------------------------------
 ; --------------------------------------------------------------
-; --------------------------------------------------------------
-; --------------------------------------------------------------
-; This demo starts where the `file-read.scm` demo in the sensory
-; project leaves off. See
+; To complete the pipeline, text is to be streamed from a text file.
+; The `file-read.scm` demo in the sensory project already shows the
+; this step. See
+;
 ; https://github.com/opencog/sensory/raw/master/examples/file-read.scm
+;
+; Repeated here.
 
+; Opening the text stream will create a ValueStream. It needs to be
+; placed where the parser can find it. Anywhere will do, as long as the
+; parser attaches to it at the same place. Also: a demo text file must
+; be present at /tmp/demo.txt for this to work.
+(cog-execute!
+	(SetValue (Anchor "pipe demo") (Predicate "text src")
+		(Open (Type 'TextFileStream)
+			(Sensory "file:///tmp/demo.txt"))))
 
+; Parsing proceeds as before, with the text string replaced by the
+; text stream. In the current design, the parser does not expose a
+; stream, and so cog-execute! must be called once per line of text.
+; This may change. Streams probably really should stream.
+(define parse-stream
+	(LgParseBonds
+		(ValueOf (Anchor "pipe demo") (Predicate "text src"))
+		(LgDict "any") (Number 1)))
 
+(cog-execute! parse-stream)
+
+; That's it. Now wire it all together:
+(cog-execute! (edge-filter parse-stream edge-counter))
 
 ; --------------------------------------------------------------
 ; Return a text parser that counts edges on a stream. The

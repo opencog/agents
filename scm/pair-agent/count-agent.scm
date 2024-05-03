@@ -18,9 +18,9 @@
 (use-modules (srfi srfi-1))
 
 ; --------------------------------------------------------------
-; Return a text parser that counts edges on a stream. The
-; `txt-stream` must be an Atom that can serve as a source of text.
-; Typically, `txt-stream` will be
+; Return a text parser that counts words and word-pairs obtained from
+; parsing text on a stream. The `txt-stream` must be an Atom that can
+; serve as a source of text. Typically, `txt-stream` will be
 ;    (ValueOf (Concept "some atom") (Predicate "some key"))
 ; and the Value there will be a LinkStream from some file or
 ; other text source.
@@ -28,6 +28,8 @@
 ; These sets up a processing pipeline in Atomese, and returns that
 ; pipeline. The actual parsing all happens in C++ code, not in scheme
 ; code. The scheme here is just to glue the pipeline together.
+;
+; This is attempting to be backwards-compat with old pair-counting code.
 (define (make-parser txt-stream)
 	;
 	; Pipeline steps, from inside to out:
@@ -50,8 +52,9 @@
 	;
 	; The counter is a non-atomic pipe of (SetValue (Plus 1 (GetValue)))
 	;
-	(define NUML (Number 4))
+	(define NUML (Number 6))
 	(define DICT (LgDict "any"))
+	(define any-parse (ParseNode "ANY"))
 
 	; Increment the count on one atom.
 	(define (incr-cnt atom)
@@ -82,9 +85,11 @@
 					(Type 'LinkValue)
 					(Variable "$word-list")
 					(Variable "$edge-list"))
-				; Apply the function FUNKY to the edge-list
+				; Apply the function FUNKY to the word and edge lists.
 				(FUNKY (Variable "$word-list"))
-				(FUNKY (Variable "$edge-list")))
+				(FUNKY (Variable "$edge-list"))
+				; Increment by one for each parse
+				(incr-cnt any-parse))
 			PASRC))
 
 	(define parser (LgParseBonds txt-stream DICT NUML))
@@ -97,6 +102,28 @@
 	; until end of file is reached.
 	(stream-splitter parser atom-counter)
 )
+
+; --------------------------------------------------------------
+; Demo wrapper: Parse a single text string.
+(define (obs-texty TXT-STRING)
+
+	; We don't need to create this over and over; once is enough.
+	(define txt-stream
+		(ValueOf (Anchor "parse pipe") (Predicate "text src")))
+	(define parser (make-parser txt-stream))
+
+	(define phrali (Item TXT-STRING))
+	(cog-execute!
+		(SetValue (Anchor "parse pipe") (Predicate "text src") phrali))
+
+	; Run parser once.
+	(cog-execute! parser)
+	(cog-extract-recursive! phrali)
+)
+
+; Example:
+; (obs-texty "this is a test")
+; (cog-execute! (ValueOf (ParseNode "ANY") (Predicate "count"))
 
 ; --------------------------------------------------------------
 ; Demo wrapper: Parse contents of a file.

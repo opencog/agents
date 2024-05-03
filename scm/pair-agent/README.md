@@ -49,6 +49,20 @@ Here's the design we want for the pair-counting agent:
    - There aren't any push demos.
    - Attention control is easier with Pull.
 
+### Storage and Matrix API ???
+The batch system uses the matrix API to define pipelines: this includes
+* Which parser to use, e.g. `(make-any-link-api)`
+* How to increment counts, e.g. `(add-count-api ala)`
+* How to store updated counts, e.g. `(add-storage-count alc)`
+
+This is a pipeline framework, it is not in Atomese. Its large,
+extensive, lots of bells and whistles; many years of fully debugged
+code. Its a good/great API, capable of carrying the load.
+
+It seems to be slow, presumably due to the huge number of scheme/C++
+transitions.  To validate this, need to run a pair-count-hacked
+experiment, and actually measure.
+
 ### TODO/Open issues
 Some unresolved issues.
 * Parser wants strings as `Node`s; it would be nice to be able to work

@@ -135,7 +135,7 @@
 
 (define demo-filter
 	(Filter
-		(Glob "$x")
+		(Variable "$x")
 		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
 
 ; Run it.
@@ -145,76 +145,51 @@
 (define demo-filter
 	(Filter
 		(Rule
-			(Glob "$x") ; Input
-			(Glob "$x")) ; Output
+			(Variable "$x") ; Input
+			(Variable "$x")) ; Output
 		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
 
 ; Run it.
 (cog-execute! demo-filter)
 
 ; Same as above, but now start matching stuff inside the stream.
-; This is still an almost trivial no-op; but it does unwrap one
-; layer of LinkValue.
+; Each item in the stream is a pair: a list of words, followed
+; by a list of edges. Match these two, and keep the words.
 (define demo-filter
 	(Filter
 		(Rule
 			; Match clause - one per parse.
 			(LinkSignature
 				(Type 'LinkValue)
-				(Glob "$stuff"))
+				(Variable "$words")
+				(Variable "$edges"))
 
 			; Output
-			(Glob "$stuff"))
+			(Variable "$words"))
 
 		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
 
 ; Run it.
 (cog-execute! demo-filter)
 
-; Extracting the desired components is easier if a printer is used for
-; debugging. This allows the innards of the match clause to be viewed
-; directly.
-(define demo-word-filter
-	(Filter
-		(Rule
-			; Match clause - one per parse.
-			; The LinkValue wraps two more: one holding the words
-			; in the sentence, and another holding the word-pairs.
-			(LinkSignature
-				(Type 'LinkValue)
-				(LinkSignature
-					(Type 'LinkValue)  ; This matches the word-list
-					(Glob "$words"))
-				(Type 'LinkValue))    ; This matches the edge-list
-
-			; Output clause
-			(debug-prt (Glob "$words")))
-
-		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
-
-; Run it.
-(cog-execute! demo-word-filter)
-
 ; Same as above, but this time, ignore the words, and get the edges.
-; Also, replace the printer function with a generic function FUNKY.
-; This is a handy place to wire in further processing.
+; Also, apply the function FUNKY to the edge-list. This will be a handy
+; place to wire in further processing.
 (define (edge-filter FUNKY)
 	(Filter
 		(Rule
 			; Match clause - one per parse.
 			(LinkSignature
-				(Type 'LinkValue) ; type of (vertex,edge) pair
-				(Type 'LinkValue) ; the word-list
-				(LinkSignature    ; the edge-list
-					(Type 'LinkValue)  ; edge-list wrapper
-					(Glob "$edge-list")))      ; all of the edges
+				(Type 'LinkValue)
+				(Variable "$words")
+				(Variable "$edge-list"))
+
 			; Apply the functin FUNKY to the edge-list
-			(FUNKY (Glob "$edge-list"))
+			(FUNKY (Variable "$edge-list"))
 		)
 		(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1))))
 
-; Try it!
-
+; Try it! Use the debug printer as the function to call.
 (cog-execute! (edge-filter debug-prt))
 
 ; --------------------------------------------------------------
@@ -239,18 +214,21 @@
 (cog-execute! (ValueOf (Concept "foobar") (Predicate "count")))
 
 ; Wire it into the earlier pipelines
-(define edge-counter
+(define (edge-counter ITEM)
 	(Filter
 		(Rule
 			; (TypedVariable (Variable "$edge") (Type 'Edge))
 			(LinkSignature
-				(TypeNode 'LinkValue)
-				(Glob "$edge"))
-			(debug-prt (Glob "$edge")))
-			; (incr-cnt (Variable "$edge")))
-		edge-filter))
+				(Type 'LinkValue)
+			(Variable "$edge")
+)
+			(debug-prt (Variable "$edge")))
+		ITEM))
 
-(cog-execute! edge-counter)
+			; (incr-cnt (Variable "$edge")))
+(cog-execute! (edge-filter edge-counter))
+(cog-execute! (edge-filter debug-prt))
+
 
 ; --------------------------------------------------------------
 ; --------------------------------------------------------------

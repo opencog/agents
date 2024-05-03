@@ -32,11 +32,20 @@
 	(LgParseBonds (Phrase "this is a test") (LgDict "any") (Number 1)))
 
 ; The `(Number 1)` says that only one parse is wanted.
-; Note how a bunch of Edges flew by; these specify the word pairs.
-; Note how the list of edges is wrapped by a `LinkValue`.
-; Note how a list of words is generated, before the edges; it is also
-; wrapped in a LinkValue. The graph, as a whole, consisting of a list of
-; vertexes (the words) and edges, is wrapped in a LinkValue.
+;
+; The result of parsing is a list of pairs. First item in a pair is
+; the list of words in the sentence; the second is a list of the edges.
+; Thus, each pair has the form
+;     (LinkValue
+;         (LinkValue (Word "this") (Word "is") (Word "a") (Word "test"))
+;         (LinkValue (Edge ...) (Edge ...) ...))
+;
+; This pair should be thought of as a graph G = (V,E) where V is the
+; set of vertices in the graph (here, the words) and E is the set of
+; edges (here, these are word-pairs).
+;
+; One graph G is generated for each distinct parse. To avoid flooding
+; the screen, only pne parse is asked for; thus, `(Number 1)`.
 
 ; View the contents of the AtomSpace:
 (cog-report-counts)
@@ -223,7 +232,9 @@
 (cog-execute! (ValueOf (Concept "foobar") (Predicate "count")))
 
 ; Use the previous utility function to wire the counter into
-; the parsing pipeline.
+; the parsing pipeline. Note that the Rule is a bit fancier, here.
+; It includes a type declaration to avoid counting if passed bad
+; data: it insists that each individual edge really is of type 'Edge.
 (define (edge-counter EDGE-LIST)
 	(Filter
 		(Rule

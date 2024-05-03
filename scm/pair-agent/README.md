@@ -63,6 +63,12 @@ It seems to be slow, presumably due to the huge number of scheme/C++
 transitions.  To validate this, need to run a pair-count-hacked
 experiment, and actually measure.
 
+The `add-storage-count` API fetches counts from storage, if not in
+atomspace. This needs to be used instead of the `SetValue` default.
+It implements atomic update.
+
+There's also a marginal counter, but its unusued...
+
 ### TODO/Open issues
 Some unresolved issues.
 * Parser wants strings as `Node`s; it would be nice to be able to work
@@ -80,3 +86,6 @@ Some unresolved issues.
   that this resembles a generic fold. The alternative to this is a
   `AtomicSetValueLink` which holds a lock to make sure the update is
   atomic. The risk is that naive users will discover deadlocks. Hmmm.
+* There lready is a `FetchValueOf` but it needs to be fixed to take
+  default, just like `ValueOf`
+* Need a 'count-key etc. comparable to matrix API

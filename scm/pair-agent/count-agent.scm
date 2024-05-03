@@ -158,13 +158,15 @@
 ; (obs-file "/tmp/demo.txt")
 ;
 ; Look at results. Poke around, look at counts.
-; (cog-report-counts)
-; (cog-execute! (ValueOf (Word "is") (Predicate "count")))
-; (cog-execute! (ValueOf
-;     (Edge (Bond "ANY") (List (Word "is") (Word "a")))
-;     (Predicate "count")))
-;
+#|
+(cog-report-counts)
+(cog-execute! (ValueOf (Word "is") (Predicate "count")))
+(cog-execute! (ValueOf
+    (Edge (Bond "ANY") (List (Word "is") (Word "a")))
+    (Predicate "count")))
+
 ; Erase all words, so we can try again.
-; (extract-type 'WordNode)
+(extract-type 'WordNode)
+|#
 
 ; --------------------------

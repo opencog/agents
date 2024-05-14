@@ -1,28 +1,35 @@
-;
-; generate-agent.scm
-; Generate text
-;
-; link-generator -c 4 -k 4 -l en 
-; link-generator -l en -s 0
-; This is * test
-; echo 'This \* a te\* of \*.a sentence generation' | time link-generator -l en -s 0 --verbosity=2
-; echo 'This is a \*' | time link-generator -l en -s 0 --verbosity=2
-;
-; Early versions would take prior string and just add one more star.
-; Or maybe two.
-;
-; General issues:
-; * Allow link-parser app to special case wild-cards for generation.
-; * Loading of entire dict is unfeasible, so...
-;   Load only possible links?
-;
-; Ideas:
-; -- Parse given word seq containing blanks, use unknown word for
-;     blanks, then lookup all words with matching disjuncts. This
-;     requires:
-; * Allow dict lookup of words according to desired disjuncts.
-;
-;
+Generating output
+=================
+Design notes for generating output text. Two ideas: use LG and use dorky
+pairs.
+
+## LG generation
+Generate text with Link Grammar. This is the correct long-term solution,
+but requires some fair amount of work on the LG side and on the
+`lg-atomese` modules, and here. So for proof-of-concept, just skip this
+for now.
+```
+link-generator -c 4 -k 4 -l en
+link-generator -l en -s 0
+This is * test
+echo 'This \* a te\* of \*.a sentence generation' | time link-generator -l en -s 0 --verbosity=2
+echo 'This is a \*' | time link-generator -l en -s 0 --verbosity=2
+```
+Early versions would take prior string and just add one more star.
+Or maybe two stars. Keep it short.
+
+General issues:
+* Allow link-parser app to special case wild-cards for generation.
+* Loading of entire dict is unfeasible, so...
+  Load only possible links?
+
+Ideas:
+* Parse given word seq containing blanks, use unknown word for
+  blanks, then lookup all words with matching disjuncts. This
+  requires:
+* Allow dict lookup of words according to desired disjuncts.
+
+
 OK, screw that. The diary part ten is exploring this, here are the best
 ideas in summary form:
 
@@ -33,7 +40,6 @@ iterated and sorted into high-to-low MI order. This provides a weighted
 distribution, from which a rescaled uniform-random choice can be made.
 
 2) Random sample N out of full incoming set.
-
 
 Lets steam-process this: Query returns list of edges
 	(Query (Variable "next") ; vardecl

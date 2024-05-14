@@ -74,6 +74,7 @@
 ;
 ; Look at results. Poke around, look at counts.
 (cog-report-counts)
+(cog-get-atoms 'Word)
 (cog-execute! (ValueOf (Word "is") (Predicate "*-TruthValueKey-*")))
 (cog-get-atoms 'Edge)
 (cog-execute! (ValueOf
@@ -82,6 +83,16 @@
 
 ; Erase all words, so we can try again.
 (extract-type 'WordNode)
+
+(cog-close storage-node)
+
+; Start all over again.
+(use-modules (opencog persist-rocks))
+(define storage-node (MonoStorageNode "monospace:///tmp/foo.rdb"))
+(cog-open storage-node)
+(load-atomspace)
+(cog-report-counts)
+
 |#
 
 ; --------------------------

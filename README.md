@@ -14,7 +14,7 @@ But it was built as a batch system, training on large blobs of data,
 moving from one training stage to the next. This turns out to be
 unmanagable: its complicated, its fragile. It's hard to track status
 and to run experiments. Hard to redo batch steps when bugs get fixed
-and system achitecture changes.
+and system architecture changes.
 
 Most importantly, the above is a roadblock to scaling: the core idea is
 that the learning can be done recursively. But if the recursive steps

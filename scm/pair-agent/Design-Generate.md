@@ -29,9 +29,10 @@ Ideas:
   requires:
 * Allow dict lookup of words according to desired disjuncts.
 
+OK, screw that. There are multiple design issues raised by above.
 
-OK, screw that. The diary part ten is exploring this, here are the best
-ideas in summary form:
+## Simple chaining
+For quick bringup, lets just do simple chaining. Ideas in summary form:
 
 1) Starting with a word A, use incoming set to randomly select some
 subset of all possible edges. This will be called the "focus set" or the
@@ -41,13 +42,14 @@ distribution, from which a rescaled uniform-random choice can be made.
 
 2) Random sample N out of full incoming set.
 
-Lets steam-process this: Query returns list of edges
+Lets stream-process this: Query returns list of edges
+```
 	(Query (Variable "next") ; vardecl
       (EdgeLink (Predicate "ANY")
 			(List (Word "start") (Variable "next"))))
-
+```
 This returns a list (a short list? where do we plug in N to cap the size?)
-The list is actually a QueueValue.
+The list is actually a `QueueValue`.
 
 3) Out of this queue Value, select one, with the proper weighting.
    Treating this as a collection of priors requires a sum over all elts
@@ -55,13 +57,16 @@ The list is actually a QueueValue.
    to choose one for this weighted distribution. This requires a
    "non-local" RAM-walking sum.
 
-A local way of doing this is to pick a min-MI cutoff, and selecting the
-first elt that is above the cutoff.
+3a) Create a pipeline elt that takes list, adds the weights, then
+    selects N random items from that weighted list.
 
-A quasi-local way is to take the average of the first three elts,
-the first K elts, and then accept the first that is above this average.
-So the first K are always discarded, until the moving average is arrived
-at.
+3b) A local way of doing this is to pick a min-MI cutoff, and selecting
+    the first elt that is above the cutoff.
+
+3c) A quasi-local way is to take the average of the first three elts,
+    the first K elts, and then accept the first that is above this average.
+    So the first K are always discarded, until the moving average is arrived
+    at.
 
 This needs:
 4) Atomese to fish out/Filter the MI from the correct location

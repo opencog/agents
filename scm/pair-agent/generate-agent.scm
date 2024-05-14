@@ -5,10 +5,16 @@
 ; link-generator -c 4 -k 4 -l en 
 ; link-generator -l en -s 0
 ; This is * test
+; echo 'This \* a te\* of \*.a sentence generation' | time link-generator -l en -s 0 --verbosity=2
+; echo 'This is a \*' | time link-generator -l en -s 0 --verbosity=2
+;
+; Early versions would take prior string and just add one more star.
+; Or maybe two.
 ;
 ; General issues:
 ; * Allow link-parser app to special case wild-cards for generation.
 ; * Loading of entire dict is unfeasible, so...
+;   Load only possible links?
 ;
 ; Ideas:
 ; -- Parse given word seq containing blanks, use unknown word for
@@ -20,7 +26,7 @@
 OK, screw that. The diary part ten is exploring this, here are the best
 ideas in summary form:
 
-1) Starting with a word A, use incoming set to randonly select some
+1) Starting with a word A, use incoming set to randomly select some
 subset of all possible edges. This will be called the "focus set" or the
 "attentional focus". Because it is small, it can be exhaustively
 iterated and sorted into high-to-low MI order. This provides a weighted

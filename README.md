@@ -54,6 +54,12 @@ The code here adds some non-trivial processing steps on top of the
 basic sensori-motor API provided there. Be sure to go through the
 examples there.
 
+Turns out that action-perception is far more complicated than one might
+think. Thus, to address the issues discovered there, the
+[OpenCog (Sensori-)Motor project](https://github.com/opencog/motor)
+has been started. Progress on this project, Agents, is stalled, until
+the deeper issues explored there are resolved.
+
 For examples in this project, see the [examples](./examples) directory
 here.
 

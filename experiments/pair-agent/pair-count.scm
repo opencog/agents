@@ -20,7 +20,7 @@
 ;
 (use-modules (opencog) (opencog exec) (opencog persist))
 (use-modules (opencog nlp) (opencog nlp lg-parse))
-(use-modules (opencog sensory))
+(use-modules (opencog sensory-v0))
 (use-modules (srfi srfi-1))
 
 ; --------------------------------------------------------------

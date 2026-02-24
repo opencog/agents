@@ -30,13 +30,13 @@ Atomese code snippet, ready-to-run, and that `Atomese-IDL` will be a
 sheaf-theoretic, Link-Grammar inspired "jigsaw interface" to the code
 snippet.
 
-The overall design is not yet clear; soe some of these may end up being
+The overall design is not yet clear; so some of these may end up being
 triples, not quads, while in other cases, there may be yet more
 structural information encoded.
 
 A "memory" architecture
 -----------------------
-The core archtiecture builds on the conventional notion of a
+The core architecture builds on the conventional notion of a
 conversational context, or of a memory subsystem.  Here, some large
 collection of text paragraphs (e.g. my diary, or perhaps these design
 notes) are split up into paragraph (or half-page) sized chunks. These
@@ -51,28 +51,26 @@ A list of design choices:
 * The vector DB will be implemented in pure Atomese. This is both a
   terrible and a great design choice. It is terrible, because the
   performance will surely be a disaster. It is great, because it will
-  force an exposition of "Atomese-as-psuedocode" which can be mirg
-* I need a vector DB. There are two possibilities: (1) create an Atomese
-  wrapper around Faiss, the open source facebook vector DB, (2) create a
-  pure-atomese implementation of a vector DB, or (3) do both.
+  force an exposition of "Atomese-as-psuedocode" which can be migrated
+  to different implementations, while maintaining the same, or similar
+  API's.
+* That is, part of this experiment is to also explore the homotopic
+  transformation of Atomese.
 
-Option (3) above is the interesting one. This creates a pure atomese
-description of what a vector DB should do. In essence, the Atomese can
-be thought of as pseudo-code, except that its a bit more precise, since
-Atomese is directly executable (with questionable performance, as well
-as having other issues, like an unclear API specification).
+That is, a pure atomese description is to be created of what a vector DB
+should do. In essence, the Atomese can be thought of as pseudo-code,
+except that it is a bit more precise, since Atomese is directly
+executable. How well the API of that Atomese can be described is a part
+of the experiment.
 
 FWIW, the pure-Atomese version needs to also implement the search algo.
-Claude mentions HNSW, IVF and more:
-* ColBERT -- vectorize tokes, sum max tokens
-* (Others that seem not relevant here)
-
-Off-the-shelf
--------------
-Some existing systems:
-* LangChain and LlamaIndex provide MCP-like API's
-* Gorilla LLM -- specifically trained for tool calling.
-
+* IVF -- inverted file index: Assign the vectors to k-means clusters,
+  then do dot-products against the clusters.
+* HNSW -- "Hierarchical Navigable Small World" -- build a graph of
+  nearest neightbors, and then hill-climb (i.e. "greedy") to find
+  closest
+* ColBERT -- vectorize tokens, sum max tokens (???)
+* My old "membership club" idea from the learn project.
 
 Jigsaw API's
 ------------
@@ -168,8 +166,3 @@ shallow, inane questions that reveal it does not understand the big
 picture, but is quite eager to get lost in the details. That is how
 spaghetti code is born: the urge to write code, before understanding teh
 problem. Hmm.
-
-Implementation
---------------
-I will attempt to implement some variant of the above ideas in the
-[agents project](https://github.com/opencog/agents). Wish me luck.

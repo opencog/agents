@@ -24,4 +24,7 @@ the static batch text-processing pipeline in the
 code was moved to (implemented in) the
 [motor project](https://github.com/opencog/motor).
 
+***Critique:*** It's not entirely "pure Atomese"; the Atomese remains
+glued together with scheme functions.
+
 ----

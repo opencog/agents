@@ -27,6 +27,12 @@ stream is a stand-in for generic agent motor control: after seeing and
 "thinking", the agent "responds" with "actions" out into the external
 environment.
 
+***Critique***: What was implemented was not actually "pure Atomese".
+Its "mostly atomese", but still uses scheme functions to wrap important
+parts of the system. Here, "pure Atomese" is Atomese that can be saved
+to storage (e.g. a `RocksStorageNode`) and restored, and then run, with
+no other intervention.
+
 ## Pair counting agent
 Prototype proof of concept. Implemented in `pair-agent.scm`. Works.
 Based on demo in `examples/pair-count.scm`, which explains it in detail.

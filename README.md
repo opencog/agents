@@ -7,7 +7,7 @@ Version 0.0.2 -- Extremely early prototyping stage.
 
 ### Overview
 The [Opencog Learn](https://github.com/opencog/learn) project showed
-that the basic conscept of structure learning works and is scalable
+that the basic concept of structure learning works and is scalable
 and can deal with observing and learning real-world structures. Great!
 
 But it was built as a batch system, training on large blobs of data,
@@ -26,11 +26,19 @@ start with a clean slate, here. The general ideas get recycled. The
 framework changes dramatically.
 
 One current goal is to rewrite important parts of the pipeline in pure
-Atomese. This seems like the "right thing to do", so that, for example,
-AS-MOSES can be used to mutate and optimize important subsystems: this
-would be impossible if the processing was done in a conventional
-programming language. But these details are unclear, and so all of
-this is a big experiment. Don't know how it will turn out.
+[Atomese](https://wiki.opencog.org/w/Atomese). Atomese is a structure
+description language; it is a language for describing graphs, symbolic
+and logical expressions, interface defintiions, algorithms and
+psuedo-code, vectors, tensors, sheaves, and higher-order methematical
+objects from model theory, category theory, proof theory and so on.
+
+"Pure" Atomese is Atomese that has no additional requirements beyond
+the AtomSpace. In particular, it does NOT use scheme or python (or C++
+or javascript or npm or Java or rust ...) to express algorithms: the
+algorithms themselves are written in Atomese.
+
+The 
+
 
 The hope is that a pure Atomese structure will make the recursive jump
 easy. Without the recursive jump, well, its just Symbolic AI from
@@ -60,7 +68,10 @@ think. Thus, to address the issues discovered there, the
 has been started. Progress on this project, Agents, is stalled, until
 the deeper issues explored there are resolved.
 
-For examples in this project, see the [examples](./examples) directory
-here.
+### Pure Atomese
+One of the design goals is to emply "pure Atomese" for all agents.
+
+### The Experiments
+See the [experiments](./experiments) directory for more.
 
 --------------

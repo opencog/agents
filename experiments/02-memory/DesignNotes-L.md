@@ -6,10 +6,10 @@ from the [sensory project](https://github.com/opencog/sensory/),
 modified and edited to suit this project.
 
 The goal is to find a simple design that could provide a verbal (text)
-interface to complex strutural systems, as well as a rudimentary form
+interface to complex structural systems, as well as a rudimentary form
 of memory. It is based on using an LLM to generate vector embeddings of
 text snippets; these vector embeddings are then be associated with
-matching algorithms written in Atomese, and thier corresponding
+matching algorithms written in Atomese, and their corresponding
 interface definitions (also written in Atomese).
 
 The LLM will be ollama, and the Atomese wrapper for it will be
@@ -19,7 +19,7 @@ The perspective is that of "semantic routing": the LLM is treated as a
 natural language API into non-verbal systems; the "thinking" happens
 non-verbally, while the text LLM provides a way of manipulating,
 controlling and working with the non-verbal elements. The idea is to
-build on the concept of RAG (retreival-augumented generation), semantic
+build on the concept of RAG (retrieval-augmented generation), semantic
 search or semantic routing, by building quads of
 ```
    (text, vector-embedding-of-text, Atomese-algo, Atomese-IDL).
@@ -51,13 +51,13 @@ A list of design choices:
 * The vector DB will be implemented in pure Atomese. This is both a
   terrible and a great design choice. It is terrible, because the
   performance will surely be a disaster. It is great, because it will
-  force an exposition of "Atomese-as-psuedocode" which can be migrated
+  force an exposition of "Atomese-as-pseudocode" which can be migrated
   to different implementations, while maintaining the same, or similar
   API's.
 * That is, part of this experiment is to also explore the homotopic
   transformation of Atomese.
 
-That is, a pure atomese description is to be created of what a vector DB
+That is, a pure Atomese description is to be created of what a vector DB
 should do. In essence, the Atomese can be thought of as pseudo-code,
 except that it is a bit more precise, since Atomese is directly
 executable. How well the API of that Atomese can be described is a part
@@ -67,7 +67,7 @@ FWIW, the pure-Atomese version needs to also implement the search algo.
 * IVF -- inverted file index: Assign the vectors to k-means clusters,
   then do dot-products against the clusters.
 * HNSW -- "Hierarchical Navigable Small World" -- build a graph of
-  nearest neightbors, and then hill-climb (i.e. "greedy") to find
+  nearest neighbors, and then hill-climb (i.e. "greedy") to find
   closest
 * ColBERT -- vectorize tokens, sum max tokens (???)
 * My old "membership club" idea from the learn project.
@@ -106,7 +106,7 @@ The first stumbling block is how to plug in the value for X into the
 Atomese. The standard solution is "prompt-based tool calling", where I
 have an extra paragraph explaining to ollama how to extract filenames
 from user text. This solution is fragile: as complexity grows, the LLM
-is increasingly confused about what is going on, where the paramters
+is increasingly confused about what is going on, where the parameters
 are.
 
 Few-shot prompting, giving examples, is more effective.
@@ -119,7 +119,7 @@ The following comes up:
   dot-product? (or rather, can I trick Claude into doing this?)
 * I need to (initially, at least) pair the Atomese expression, e.g.
   for a dot product, with a verbal description. This pairing is already
-  avaiable as a demo.scm file somewhere, but it is informal. A more
+  available as a demo.scm file somewhere, but it is informal. A more
   direct, formalized pairing seems desirable ... but how?
 * I need a way of composing jigsaws, mediating in English.  I can
   verify formal compositionality by running them through LG or perhaps
@@ -133,7 +133,7 @@ I have a demo file, called dot-product.scm  that is written to be an
 example tutorial for human readers. It shows how to compute the dot
 product of two vectors, in pure Atomese. It is annotated in such a way
 as to explain exactly what is going on. But it is also entirely
-stand-alone -- it inpcludes boilerplate to set things up, and print
+stand-alone -- it includes boilerplate to set things up, and print
 statements that print to stdout -- it assumes that a human will be
 cutting and pasting from that file to a guile REPL prompt.  I need this
 converted to a lexical entry, which will be stored in the AtomSpace.
@@ -164,5 +164,5 @@ avoid that, here.
 Basically, Claude echoed back what I said above, then asked a bunch of
 shallow, inane questions that reveal it does not understand the big
 picture, but is quite eager to get lost in the details. That is how
-spaghetti code is born: the urge to write code, before understanding teh
+spaghetti code is born: the urge to write code, before understanding the
 problem. Hmm.

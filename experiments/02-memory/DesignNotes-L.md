@@ -1,26 +1,38 @@
 Memory, Assembly, Understanding
 ===============================
-Below follows some ruminations on a simple design that could provide a
-verbal (text) interface to complex strutural systems, as well as a
-rudimentary form of memory. It is based on using an LLM, such as ollama,
-to generate vector embeddings of text snippets; these vector embeddings
-can then be associated with matching structural (symbolic) entities. It
-might offer a simple way forward past some earlier design blockages
-encountered in this project.
+This file is a copy of
+[DesignNotes-L](https://github.com/opencog/sensory/blob/master/DesignNotes-L.md)
+from the [sensory project](https://github.com/opencog/sensory/),
+modified and edited to suit this project.
+
+The goal is to find a simple design that could provide a verbal (text)
+interface to complex strutural systems, as well as a rudimentary form
+of memory. It is based on using an LLM to generate vector embeddings of
+text snippets; these vector embeddings are then be associated with
+matching algorithms written in Atomese, and thier corresponding
+interface definitions (also written in Atomese).
+
+The LLM will be ollama, and the Atomese wrapper for it will be
+`OllamaNode` as implemented in the sensory project.
 
 The perspective is that of "semantic routing": the LLM is treated as a
 natural language API into non-verbal systems; the "thinking" happens
 non-verbally, while the text LLM provides a way of manipulating,
 controlling and working with the non-verbal elements. The idea is to
 build on the concept of RAG (retreival-augumented generation), semantic
-search or semantic routing, by building triples of
+search or semantic routing, by building quads of
 ```
-   (text, vector-embedding-of-text, symbolic-structure).
+   (text, vector-embedding-of-text, Atomese-algo, Atomese-IDL).
 ```
-This is a pre-MCP conception of the interface, in part because Ollama
-does not have MCP support, and in part because MCP does not do what I
-want it to do; and so I'm exploring some more basic technologies.
 
+The current intent is that `Atomese-algo` will be some executable
+Atomese code snippet, ready-to-run, and that `Atomese-IDL` will be a
+sheaf-theoretic, Link-Grammar inspired "jigsaw interface" to the code
+snippet.
+
+The overall design is not yet clear; soe some of these may end up being
+triples, not quads, while in other cases, there may be yet more
+structural information encoded.
 
 A "memory" architecture
 -----------------------
@@ -28,18 +40,18 @@ The core archtiecture builds on the conventional notion of a
 conversational context, or of a memory subsystem.  Here, some large
 collection of text paragraphs (e.g. my diary, or perhaps these design
 notes) are split up into paragraph (or half-page) sized chunks. These
-are run through ollama to get embedding vectors (qwen3:8b offers 4K
-float vectors; earlier models offer shorter vectors). The pairing of
-(text, vect) is stored in a vector database; input queries use cosine
+are run through ollama to get embedding vectors. The pairing of
+`(text, vect)` is stored in a vector database; input queries use cosine
 similarity to find the most-similar vectors, and thus the associated
 text.
 
-A list of the obvious issues:
-* The vector embedding depends entirely on the model; embeddings are not
-  portable.
-* Besides Ollama, there's also HugginFace. Commercial embeddings are
-  available from OpenAI and Google, but these have the drawback of being
-  commercial.
+A list of design choices:
+* At this time, using a simple ollama mode, such as `nomic-embed-text`
+  is presumed to be sufficient.
+* The vector DB will be implemented in pure Atomese. This is both a
+  terrible and a great design choice. It is terrible, because the
+  performance will surely be a disaster. It is great, because it will
+  force an exposition of "Atomese-as-psuedocode" which can be mirg
 * I need a vector DB. There are two possibilities: (1) create an Atomese
   wrapper around Faiss, the open source facebook vector DB, (2) create a
   pure-atomese implementation of a vector DB, or (3) do both.

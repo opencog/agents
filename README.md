@@ -12,7 +12,7 @@ and can deal with observing and learning real-world structures. Great!
 
 But it was built as a batch system, training on large blobs of data,
 moving from one training stage to the next. This turns out to be
-unmanagable: its complicated, its fragile. It's hard to track status
+unmanageable: its complicated, its fragile. It's hard to track status
 and to run experiments. Hard to redo batch steps when bugs get fixed
 and system architecture changes.
 
@@ -29,12 +29,12 @@ One current goal is to rewrite important parts of the pipeline in pure
 [Atomese](https://wiki.opencog.org/w/Atomese). Atomese is a structure
 description language; it is a language for describing graphs, symbolic
 and logical expressions, interface definitions, algorithms and
-psuedo-code, vectors, tensors, sheaves, and higher-order methematical
+pseudo-code, vectors, tensors, sheaves, and higher-order mathematical
 objects from model theory, category theory, proof theory and so on.
 
 "Pure" Atomese is Atomese that has no additional requirements beyond
 the AtomSpace. In particular, it does NOT use scheme or python (or C++
-or javascript or npm or Java or rust ...) to express algorithms: the
+or JavaScript or npm or Java or rust ...) to express algorithms: the
 algorithms themselves are written in Atomese.
 
 The reasons for choosing Atomese over some conventional programming
@@ -100,16 +100,16 @@ The vision, as hinted above, is:
 * Atomese allows the expression of axioms and inference rules in their
   abstract form, and thus provides a natural way of expressing arbitrary
   symbolic, mathematical systems.
-* The self-expressivenes and rewritablility should allow for mutability
+* The self-expressiveness and rewriteability should allow for mutability
   and cross-breeding between different algorithms.
 * The interface description language (IDL) for an algorithm is itself
   written in Atomese: thus, algorithms become "jigsaw pieces" that can
   be snapped together or assembled using any generative algorithm
   whatsoever.
-* Generative algorithms include rewrit systems, odometers, stochastic
+* Generative algorithms include rewrite systems, odometers, stochastic
   random walkers, Boltzmann machines, Markov logic machines, etc. and
   all of these different algorithms themselves can be written in Atomese.
-* This, in a sense, Atomese also becomes a psuedo-code language: the
+* This, in a sense, Atomese also becomes a pseudo-code language: the
   Atomese expression is meant to encode "what to do" and not any one
   specific, concrete implementation.
 

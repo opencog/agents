@@ -8,10 +8,10 @@ Linas) does not wish to commit to any specific software framework or
 architecture.
 
 That is, these are experiments in creating software frameworks and
-architectures; these are pathfinders, and may perhaps someday lead to
+architectures; these are path-finders, and may perhaps someday lead to
 a robust, usable system.
 
-The Experiments, in chronoglogical order:
+The Experiments, in chronological order:
 
 ### Text processing agent (Dec 2024)
 The [01-pair-agent](01-pair-agent) directory contains a prototype for

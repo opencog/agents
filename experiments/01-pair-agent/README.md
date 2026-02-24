@@ -106,6 +106,6 @@ Some unresolved issues.
   that this resembles a generic fold. The alternative to this is a
   `AtomicSetValueLink` which holds a lock to make sure the update is
   atomic. The risk is that naive users will discover deadlocks. Hmmm.
-* There lready is a `FetchValueOf` but it needs to be fixed to take
+* There already is a `FetchValueOf` but it needs to be fixed to take
   default, just like `ValueOf`
 * Need a 'count-key etc. comparable to matrix API

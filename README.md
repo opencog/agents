@@ -28,7 +28,7 @@ framework changes dramatically.
 One current goal is to rewrite important parts of the pipeline in pure
 [Atomese](https://wiki.opencog.org/w/Atomese). Atomese is a structure
 description language; it is a language for describing graphs, symbolic
-and logical expressions, interface defintiions, algorithms and
+and logical expressions, interface definitions, algorithms and
 psuedo-code, vectors, tensors, sheaves, and higher-order methematical
 objects from model theory, category theory, proof theory and so on.
 
@@ -38,7 +38,7 @@ or javascript or npm or Java or rust ...) to express algorithms: the
 algorithms themselves are written in Atomese.
 
 The reasons for choosing Atomese over some conventional programming
-langauge are manifold. For example, Atomese resembles pseudo-code,
+language are manifold. For example, Atomese resembles pseudo-code,
 except its actually runnable. But since its pseudo-code, it can have
 multiple concrete implementations: it is mutable, in that it is
 re-writable to target any particular compute fabric (CPU's, GPU's...)
@@ -97,7 +97,7 @@ The vision, as hinted above, is:
 * Atomese allows the operation of graph rewrite engines.
 * The rewrite rules can themselves be expressed in Atomese, so it is a
   self-rewriting system.
-* Atomese allows the expression of axioms and inference rules in thier
+* Atomese allows the expression of axioms and inference rules in their
   abstract form, and thus provides a natural way of expressing arbitrary
   symbolic, mathematical systems.
 * The self-expressivenes and rewritablility should allow for mutability
@@ -105,7 +105,7 @@ The vision, as hinted above, is:
 * The interface description language (IDL) for an algorithm is itself
   written in Atomese: thus, algorithms become "jigsaw pieces" that can
   be snapped together or assembled using any generative algorithm
-  whatsover.
+  whatsoever.
 * Generative algorithms include rewrit systems, odometers, stochastic
   random walkers, Boltzmann machines, Markov logic machines, etc. and
   all of these different algorithms themselves can be written in Atomese.

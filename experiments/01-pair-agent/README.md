@@ -21,7 +21,7 @@ high-ranked word-pair streams. The pair-counting agent is in
 `pair-agent.scm` and the generator is in `generator.scm`.
 
 ***Motivation***: Word-pairs stand in for generic complex networks of
-occurances in the sensory environment that correlate with agent internal
+occurrences in the sensory environment that correlate with agent internal
 state. The agent sees and responds to the environment. The generation
 stream is a stand-in for generic agent motor control: after seeing and
 "thinking", the agent "responds" with "actions" out into the external
@@ -87,7 +87,7 @@ The `add-storage-count` API fetches counts from storage, if not in
 atomspace. This needs to be used instead of the `SetValue` default.
 It implements atomic update.
 
-There's also a marginal counter, but its unusued...
+There's also a marginal counter, but its unused...
 
 ### TODO/Open issues
 Some unresolved issues.

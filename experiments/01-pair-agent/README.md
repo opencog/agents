@@ -4,7 +4,7 @@ This directory contains an early prototype for an agent that could
 process text files; it was intended to be a dynamic replacement for
 the static batch text-processing pipeline in the "learn" project.
 
-Created in Dec 2024. The prototype "works", or ratehr, worked; the
+Created in Dec 2024. The prototype "works", or rather, worked; the
 core design of the sensory module changed since then, and there have
 significant changes to Atomese, so as to make this easier to accomplish.
 

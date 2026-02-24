@@ -1,4 +1,18 @@
 Text processing agent
+=====================
+This directory contains an early prototype for an agent that could
+process text files; it was intended to be a dynamic replacement for
+the static batch text-processing pipeline in the "learn" project.
+
+Created in Dec 2024. The prototype "works", or ratehr, worked; the
+core design of the sensory module changed since then, and there have
+significant changes to Atomese, so as to make this easier to accomplish.
+
+This specific subsystem was not further developed after it's initial
+creation, although the overall goal and general outline remains in
+force.
+
+Text processing agent
 ---------------------
 ***Design goal***: Agent that reads text and responds, by generating text.
 
@@ -35,7 +49,7 @@ Here's the design we want for the pair-counting agent:
 2) (Optional) Some way to split one source into multiple sources.
    Maybe this:
    https://wiki.opencog.org/w/PromiseLink#Multiplex_Example
-    but what happens if the readers don't both read ???
+   but what happens if the readers don't both read ???
 3) A Filter that takes above and increments pair counts.
    Done. Its non-atomic, but so what. Perhaps we can live with
    that, given that sampling is statistical, anyway.

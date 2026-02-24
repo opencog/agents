@@ -27,4 +27,11 @@ code was moved to (implemented in) the
 ***Critique:*** It's not entirely "pure Atomese"; the Atomese remains
 glued together with scheme functions.
 
+### Memory (Feb 2026)
+The [02-memory](02-memory) directory contains (will contain) an
+experiment that tries to combine an LLM API with the basic idea of
+Retrieval-augumented generation (RAG) of vector systems, with a
+sheaf-theoretic IDL (interface descrition langauge) of the pure
+Atomese algos.
+
 ----

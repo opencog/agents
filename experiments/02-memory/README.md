@@ -13,11 +13,18 @@ Directory layout
   out-dated, incomplete, mis-guided and confused. Part of the
   experiment is to see how far we can go here.
 
+Build, Install, Run
+-------------------
+Do this:
+```
+mkdir build; cd build; cmake ..; make -j
+sudo make install
+../scm/start.scm
+```
+
 
 Specific steps
 --------------
-* Steal the CMakefile and the config generator from atomspace-viz/analytics
-  These two compile scm files into pure Atomese, stored in RocksDB.
 * Use the file-crawler demo mentioned in learn/stream
 * Use the OllamaNode unit test to compute the vector embeddings.
 * Use the dot-product from one of the example files.

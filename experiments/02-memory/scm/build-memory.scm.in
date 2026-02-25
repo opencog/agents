@@ -1,0 +1,53 @@
+;
+; build-memory.scm.in
+;
+; Build script to compile Atomese memory into RocksDB.
+; This file is configured by CMake - do not edit directly.
+;
+; During the build process, this script:
+; 1. Loads all memory .scm files into an AtomSpace
+; 2. Creates a RocksStorageNode pointing to the build directory
+; 3. Stores the entire AtomSpace to RocksDB
+; 4. Closes and exits
+;
+; The resulting RocksDB directory is then installed to
+; /usr/local/share/atomese/memory during 'make install'.
+;
+
+(use-modules (opencog))
+(use-modules (opencog persist))
+(use-modules (opencog persist-rocks))
+
+; Paths configured by CMake
+(define source-dir "@CMAKE_CURRENT_SOURCE_DIR@")
+(define project-dir "@CMAKE_SOURCE_DIR@")
+(define rdb-path "rocks://@CMAKE_BINARY_DIR@/memory.rdb")
+
+; Load all the memory .scm files
+(format #t "Loading memory from ~a~%" source-dir)
+
+; Load the main memory file(s)
+; Add additional (load ...) statements here as more components are created
+(load (string-append source-dir "/file-reader.scm"))
+
+; Bind directory NameNodes to actual project paths via FileSysNode.
+; These are the only PipeLink definitions for "scm dir" and "notebook dir"
+; (file-reader.scm declares the pipeline but not the bindings).
+(use-modules (opencog sensory))
+(PipeLink (NameNode "scm dir")
+	(FileSysNode (string-append "file://" project-dir "/scm")))
+(PipeLink (NameNode "notebook dir")
+	(FileSysNode (string-append "file://" project-dir "/notebook")))
+
+; Note: start.scm is a standalone runtime script (opens RocksDB, loads
+; atoms, triggers pipelines) -- it is NOT loaded during the build.
+
+; Create RocksStorageNode and store everything
+(format #t "Storing to ~a~%" rdb-path)
+(define rsn (RocksStorageNode rdb-path))
+(cog-open rsn)
+(store-atomspace)
+(cog-close rsn)
+
+(format #t "Memory compilation complete.~%")
+(exit 0)

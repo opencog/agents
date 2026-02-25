@@ -58,21 +58,25 @@
 ; Stage 4 — Directory list commands.
 ;
 ; PureExec sequences: first write the "ls" command, then read the
-; result. Same pattern as the filesys.scm example.
+; result. Same pattern as the filesys.scm example. PureExec returns
+; a LinkValue of ALL child results; ElementOf extracts element 1
+; (the read result), discarding element 0 (the write echo).
 ;
 (DefineLink
 	(DefinedSchema "list-scm-files")
-	(PureExec
-		(SetValue (NameNode "scm dir") (Predicate "*-write-*")
-			(Item "ls"))
-		(ValueOf (NameNode "scm dir") (Predicate "*-read-*"))))
+	(ElementOf (Number 1)
+		(PureExec
+			(SetValue (NameNode "scm dir") (Predicate "*-write-*")
+				(Item "ls"))
+			(ValueOf (NameNode "scm dir") (Predicate "*-read-*")))))
 
 (DefineLink
 	(DefinedSchema "list-notebook-files")
-	(PureExec
-		(SetValue (NameNode "notebook dir") (Predicate "*-write-*")
-			(Item "ls"))
-		(ValueOf (NameNode "notebook dir") (Predicate "*-read-*"))))
+	(ElementOf (Number 1)
+		(PureExec
+			(SetValue (NameNode "notebook dir") (Predicate "*-write-*")
+				(Item "ls"))
+			(ValueOf (NameNode "notebook dir") (Predicate "*-read-*")))))
 
 ; ---------------------------------------------------------------
 ; Stage 5 — Logging filters.

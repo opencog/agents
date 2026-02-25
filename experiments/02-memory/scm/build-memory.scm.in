@@ -1,17 +1,17 @@
 ;
-; build-analytics.scm.in
+; build-memory.scm.in
 ;
-; Build script to compile Atomese analytics into RocksDB.
+; Build script to compile Atomese memory into RocksDB.
 ; This file is configured by CMake - do not edit directly.
 ;
 ; During the build process, this script:
-; 1. Loads all analytics .scm files into an AtomSpace
+; 1. Loads all memory .scm files into an AtomSpace
 ; 2. Creates a RocksStorageNode pointing to the build directory
 ; 3. Stores the entire AtomSpace to RocksDB
 ; 4. Closes and exits
 ;
 ; The resulting RocksDB directory is then installed to
-; /usr/local/share/cogserver/analytics during 'make install'.
+; /usr/local/share/cogserver/memory during 'make install'.
 ;
 
 (use-modules (opencog))
@@ -20,16 +20,14 @@
 
 ; Paths configured by CMake
 (define source-dir "@CMAKE_CURRENT_SOURCE_DIR@")
-(define rdb-path "rocks://@CMAKE_BINARY_DIR@/analytics.rdb")
+(define rdb-path "rocks://@CMAKE_BINARY_DIR@/memory.rdb")
 
-; Load all the analytics .scm files
-(format #t "Loading analytics from ~a~%" source-dir)
+; Load all the memory .scm files
+(format #t "Loading memory from ~a~%" source-dir)
 
-; Load the main analytics file(s)
+; Load the main memory file(s)
 ; Add additional (load ...) statements here as more components are created
-(load (string-append source-dir "/count-types.scm"))
-(load (string-append source-dir "/pair-mi.scm"))
-(load (string-append source-dir "/analytics-server.scm"))
+(load (string-append source-dir "/start.scm"))
 
 ; Create RocksStorageNode and store everything
 (format #t "Storing to ~a~%" rdb-path)
@@ -38,5 +36,5 @@
 (store-atomspace)
 (cog-close rsn)
 
-(format #t "Analytics compilation complete.~%")
+(format #t "Memory compilation complete.~%")
 (exit 0)

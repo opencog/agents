@@ -1,0 +1,42 @@
+;
+; build-analytics.scm.in
+;
+; Build script to compile Atomese analytics into RocksDB.
+; This file is configured by CMake - do not edit directly.
+;
+; During the build process, this script:
+; 1. Loads all analytics .scm files into an AtomSpace
+; 2. Creates a RocksStorageNode pointing to the build directory
+; 3. Stores the entire AtomSpace to RocksDB
+; 4. Closes and exits
+;
+; The resulting RocksDB directory is then installed to
+; /usr/local/share/cogserver/analytics during 'make install'.
+;
+
+(use-modules (opencog))
+(use-modules (opencog persist))
+(use-modules (opencog persist-rocks))
+
+; Paths configured by CMake
+(define source-dir "@CMAKE_CURRENT_SOURCE_DIR@")
+(define rdb-path "rocks://@CMAKE_BINARY_DIR@/analytics.rdb")
+
+; Load all the analytics .scm files
+(format #t "Loading analytics from ~a~%" source-dir)
+
+; Load the main analytics file(s)
+; Add additional (load ...) statements here as more components are created
+(load (string-append source-dir "/count-types.scm"))
+(load (string-append source-dir "/pair-mi.scm"))
+(load (string-append source-dir "/analytics-server.scm"))
+
+; Create RocksStorageNode and store everything
+(format #t "Storing to ~a~%" rdb-path)
+(define rsn (RocksStorageNode rdb-path))
+(cog-open rsn)
+(store-atomspace)
+(cog-close rsn)
+
+(format #t "Analytics compilation complete.~%")
+(exit 0)

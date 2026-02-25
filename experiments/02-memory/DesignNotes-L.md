@@ -141,12 +141,13 @@ the text.  This is the general idea. The overall design remains a bit
 vague, as do the precise usage patterns.
 
 And what did Claude say in response? "This is a genuinely novel
-architecture". Fuck me. Every time I try something novel with Claude,
-I get a ball of spaghetti code, and I am trying to figure out how to
-avoid that, here.
+architecture". It became clear that Claude has no idea of what I am
+talking about, and would not know how to implement any of the above
+without very explicit and detailed hand-holding. The contents of this
+directory wil be the results of those efforts.
 
-Basically, Claude echoed back what I said above, then asked a bunch of
-shallow, inane questions that reveal it does not understand the big
-picture, but is quite eager to get lost in the details. That is how
-spaghetti code is born: the urge to write code, before understanding the
-problem. Hmm.
+Conclusion
+----------
+I fully expect this to be a broken, chaotic, non-sensical mess. I'll try
+to keep it functional, but the lacunae will surely be large. Wish me
+luck.

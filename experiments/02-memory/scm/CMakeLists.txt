@@ -45,7 +45,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES
 # First, remove any existing installation to prevent database corruption
 # (mixing old and new RocksDB files will corrupt the database)
 INSTALL(CODE "
-    set(MEMORY_DEST \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/share/cogserver/memory\")
+    set(MEMORY_DEST \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/share/atomese/memory\")
     if(EXISTS \"\${MEMORY_DEST}\")
         message(STATUS \"Removing old memory database: \${MEMORY_DEST}\")
         file(REMOVE_RECURSE \"\${MEMORY_DEST}\")
@@ -57,6 +57,6 @@ INSTALL(CODE "
 # Now install the new RocksDB directory
 # Note: DIRECTORY installs the contents, so memory.rdb/* -> memory/*
 INSTALL(DIRECTORY "${MEMORY_RDB_DIR}/"
-    DESTINATION share/cogserver/memory
+    DESTINATION share/atomese/memory
     COMPONENT memory
 )

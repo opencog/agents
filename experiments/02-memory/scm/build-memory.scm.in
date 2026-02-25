@@ -11,7 +11,7 @@
 ; 4. Closes and exits
 ;
 ; The resulting RocksDB directory is then installed to
-; /usr/local/share/cogserver/memory during 'make install'.
+; /usr/local/share/atomese/memory during 'make install'.
 ;
 
 (use-modules (opencog))

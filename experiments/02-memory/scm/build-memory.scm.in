@@ -20,6 +20,7 @@
 
 ; Paths configured by CMake
 (define source-dir "@CMAKE_CURRENT_SOURCE_DIR@")
+(define project-dir "@CMAKE_SOURCE_DIR@")
 (define rdb-path "rocks://@CMAKE_BINARY_DIR@/memory.rdb")
 
 ; Load all the memory .scm files
@@ -28,6 +29,13 @@
 ; Load the main memory file(s)
 ; Add additional (load ...) statements here as more components are created
 (load (string-append source-dir "/file-reader.scm"))
+
+; Override directory paths with actual project directories
+(PipeLink (NameNode "scm dir")
+	(FileSysNode (string-append "file://" project-dir "/scm")))
+(PipeLink (NameNode "notebook dir")
+	(FileSysNode (string-append "file://" project-dir "/notebook")))
+
 (load (string-append source-dir "/start.scm"))
 
 ; Create RocksStorageNode and store everything

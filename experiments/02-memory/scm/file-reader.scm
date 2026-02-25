@@ -1,73 +1,158 @@
 ;
-; file-reader.scm -- Pure Atomese file-reading pipeline
+; file-reader.scm -- Pure Atomese directory-scanning file-reader pipeline
 ;
-; Declarative pipeline for reading a text file line-by-line. All
-; definitions are pure Atomese — no top-level Trigger or cog-execute!
-; calls — so they survive a RocksDB store/restore cycle.
+; Declarative pipeline for discovering files in project directories and
+; logging each discovered filename to /tmp/agent.log. All definitions are
+; pure Atomese — no top-level Trigger or cog-execute! calls — so they
+; survive a RocksDB store/restore cycle.
 ;
-; The pipeline has three stages:
-;   1. File binding  — PipeLink mapping a name to a TextFileNode
-;   2. File open     — "file-open" pipeline wires the stream
-;   3. Text stream   — "text stream" delivers lines one at a time
-;   4. Line reader   — passthrough Filter (placeholder for processing)
+; The pipeline has these stages:
+;   1. Directory bindings  — PipeLinks for two FileSysNodes
+;   2. Log file binding    — TextFileNode in append mode
+;   3. dir-open pipeline   — opens directories and log file
+;   4. Directory list cmds — PureExec for write-then-read sequencing
+;   5. Logging filters     — iterate filenames, write to log
+;   6. file-scan pipeline  — lists dirs, caches results, drains logs
+;   7. Named file streams  — downstream handles
+;   8. file-reader filter  — passthrough placeholder
 ;
 ; Runtime usage (after loading from RocksDB):
-;   (Trigger (Name "file-open"))                        ; open & wire
-;   (Trigger (Name "text stream"))                      ; read one line
-;   (Trigger (Drain (DefinedSchema "line-reader")))     ; drain all
+;   (Trigger (Name "dir-open"))              ; open dirs + log file
+;   (Trigger (Name "file-scan"))             ; ls both dirs, log filenames
+;   (Trigger (Name "scm file stream"))       ; access scm file list
+;   (Trigger (Name "notebook file stream"))  ; access notebook file list
 ;
+
 (use-modules (opencog) (opencog sensory))
 
 ; ---------------------------------------------------------------
-; Stage 1 — File binding.
+; Stage 1 — Directory bindings.
 ;
 ; PipeLink is a UniqueLink: creating a new PipeLink with the same
-; NameNode silently replaces the old one, so the file path can be
-; changed at runtime without touching the rest of the pipeline.
+; NameNode silently replaces the old one, so directory paths can be
+; overridden (e.g. by build-memory.scm.in with CMake-configured paths)
+; without touching the rest of the pipeline.
 ;
-(PipeLink (NameNode "file node") (TextFile "file:///tmp/demo.txt"))
+(PipeLink (NameNode "scm dir") (FileSysNode "file:///tmp"))
+(PipeLink (NameNode "notebook dir") (FileSysNode "file:///tmp"))
 
 ; ---------------------------------------------------------------
-; Stage 2 — File-open pipeline.
+; Stage 2 — Log file binding.
 ;
-; When triggered, this opens the file for StringValue streaming and
-; installs the resulting stream at (Anchor "file-pipe") under
-; (Predicate "text source"). The DontExec prevents the stream from
-; being consumed during installation.
+(PipeLink (NameNode "agent log") (TextFile "file:///tmp/agent.log"))
+
+; ---------------------------------------------------------------
+; Stage 3 — dir-open pipeline.
+;
+; When triggered, opens both directory FileSysNodes and the log file
+; for StringValue streaming.
 ;
 (PipeLink
-	(Name "file-open")
+	(Name "dir-open")
 	(TrueLink
-		(SetValue (NameNode "file node") (Predicate "*-open-*")
+		(SetValue (NameNode "scm dir") (Predicate "*-open-*")
 			(Type 'StringValue))
-		(SetValue (Anchor "file-pipe") (Predicate "text source")
-			(DontExec
-				(ValueOf (NameNode "file node") (Predicate "*-stream-*"))))))
+		(SetValue (NameNode "notebook dir") (Predicate "*-open-*")
+			(Type 'StringValue))
+		(SetValue (NameNode "agent log") (Predicate "*-open-*")
+			(Type 'StringValue))))
 
 ; ---------------------------------------------------------------
-; Stage 3 — Named text stream.
+; Stage 4 — Directory list commands.
 ;
-; Downstream stages consume lines via (Trigger (Name "text stream")).
-; Each trigger returns one line from the file as a StringValue.
-;
-(Pipe
-	(Name "text stream")
-	(ValueOf (Anchor "file-pipe") (Predicate "text source")))
-
-; ---------------------------------------------------------------
-; Stage 4 — Line reader (passthrough placeholder).
-;
-; A Filter with a trivial Rule that accepts every StringValue and
-; returns it unchanged. Replace the rewrite body with real processing
-; (e.g. LgParseBonds, regex extraction) in a future step.
+; PureExec sequences: first write the "ls" command, then read the
+; result. Same pattern as the filesys.scm example.
 ;
 (DefineLink
-	(DefinedSchema "line-reader")
+	(DefinedSchema "list-scm-files")
+	(PureExec
+		(SetValue (NameNode "scm dir") (Predicate "*-write-*")
+			(Item "ls"))
+		(ValueOf (NameNode "scm dir") (Predicate "*-read-*"))))
+
+(DefineLink
+	(DefinedSchema "list-notebook-files")
+	(PureExec
+		(SetValue (NameNode "notebook dir") (Predicate "*-write-*")
+			(Item "ls"))
+		(ValueOf (NameNode "notebook dir") (Predicate "*-read-*"))))
+
+; ---------------------------------------------------------------
+; Stage 5 — Logging filters.
+;
+; Iterate each filename from an ls result. The type guard
+; (Type 'StringValue) naturally skips the command-echo ItemNode at
+; position 0 of the ls result. Each filename plus a newline is
+; written to the log file.
+;
+(DefineLink
+	(DefinedSchema "log-scm-files")
 	(Filter
 		(Rule
-			(TypedVariable (Variable "$line") (Type 'StringValue))
-			(Variable "$line")
-			(Variable "$line"))
-		(Name "text stream")))
+			(TypedVariable (Variable "$fname") (Type 'StringValue))
+			(Variable "$fname")
+			(TrueLink
+				(SetValue (NameNode "agent log") (Predicate "*-write-*")
+					(Variable "$fname"))
+				(SetValue (NameNode "agent log") (Predicate "*-write-*")
+					(Item "\n"))))
+		(ValueOf (Anchor "file-pipe") (Predicate "scm files"))))
+
+(DefineLink
+	(DefinedSchema "log-notebook-files")
+	(Filter
+		(Rule
+			(TypedVariable (Variable "$fname") (Type 'StringValue))
+			(Variable "$fname")
+			(TrueLink
+				(SetValue (NameNode "agent log") (Predicate "*-write-*")
+					(Variable "$fname"))
+				(SetValue (NameNode "agent log") (Predicate "*-write-*")
+					(Item "\n"))))
+		(ValueOf (Anchor "file-pipe") (Predicate "notebook files"))))
+
+; ---------------------------------------------------------------
+; Stage 6 — file-scan pipeline.
+;
+; Lists both directories, caches the results at (Anchor "file-pipe"),
+; then drains the logging filters to write every filename to the log.
+;
+(PipeLink
+	(Name "file-scan")
+	(TrueLink
+		; List and cache
+		(SetValue (Anchor "file-pipe") (Predicate "scm files")
+			(DefinedSchema "list-scm-files"))
+		(SetValue (Anchor "file-pipe") (Predicate "notebook files")
+			(DefinedSchema "list-notebook-files"))
+		; Log every filename to /tmp/agent.log
+		(Drain (DefinedSchema "log-scm-files"))
+		(Drain (DefinedSchema "log-notebook-files"))))
+
+; ---------------------------------------------------------------
+; Stage 7 — Named file streams.
+;
+; Downstream stages consume file lists via these named triggers.
+;
+(Pipe (Name "scm file stream")
+	(ValueOf (Anchor "file-pipe") (Predicate "scm files")))
+(Pipe (Name "notebook file stream")
+	(ValueOf (Anchor "file-pipe") (Predicate "notebook files")))
+
+; ---------------------------------------------------------------
+; Stage 8 — File reader (passthrough placeholder).
+;
+; A Filter with a trivial Rule that accepts every StringValue and
+; returns it unchanged. Replace the rewrite body with real per-file
+; processing in a future step.
+;
+(DefineLink
+	(DefinedSchema "file-reader")
+	(Filter
+		(Rule
+			(TypedVariable (Variable "$fname") (Type 'StringValue))
+			(Variable "$fname")
+			(Variable "$fname"))
+		(Name "scm file stream")))
 
 ; ---------------------------------------------------------------

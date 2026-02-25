@@ -15,9 +15,11 @@
 ;
 (define rsn (RocksStorageNode
 	"rocks:///usr/local/share/atomese/memory"))
-(cog-open rsn)
-(load-atomspace)
-(cog-close rsn)
+
+; Open read-only and load all atoms, using the Atomese predicates
+; directly (same pattern as atomspace-viz bootstrap).
+(cog-execute! (SetValue rsn (Predicate "*-open-ro-*")))
+(cog-execute! (SetValue rsn (Predicate "*-load-atomspace-*")))
 
 ; ---------------------------------------------------------------
 ; Run the file-scanning pipeline.

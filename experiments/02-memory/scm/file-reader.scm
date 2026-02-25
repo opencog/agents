@@ -126,9 +126,10 @@
 			(DefinedSchema "list-scm-files"))
 		(SetValue (Anchor "file-pipe") (Predicate "notebook files")
 			(DefinedSchema "list-notebook-files"))
-		; Log every filename to /tmp/agent.log
-		(Drain (DefinedSchema "log-scm-files"))
-		(Drain (DefinedSchema "log-notebook-files"))))
+		; Log every filename to /tmp/agent.log.
+		; No Drain needed: the Filter iterates over a finite LinkValue.
+		(DefinedSchema "log-scm-files")
+		(DefinedSchema "log-notebook-files")))
 
 ; ---------------------------------------------------------------
 ; Stage 7 — Named file streams.

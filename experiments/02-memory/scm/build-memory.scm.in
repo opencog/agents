@@ -27,6 +27,7 @@
 
 ; Load the main memory file(s)
 ; Add additional (load ...) statements here as more components are created
+(load (string-append source-dir "/file-reader.scm"))
 (load (string-append source-dir "/start.scm"))
 
 ; Create RocksStorageNode and store everything

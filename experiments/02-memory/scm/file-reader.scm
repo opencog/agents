@@ -28,13 +28,10 @@
 ; ---------------------------------------------------------------
 ; Stage 1 — Directory bindings.
 ;
-; PipeLink is a UniqueLink: creating a new PipeLink with the same
-; NameNode silently replaces the old one, so directory paths can be
-; overridden (e.g. by build-memory.scm.in with CMake-configured paths)
-; without touching the rest of the pipeline.
-;
-(PipeLink (NameNode "scm dir") (FileSysNode "file:///tmp"))
-(PipeLink (NameNode "notebook dir") (FileSysNode "file:///tmp"))
+; PipeLink is a UniqueLink, so each NameNode can only have one binding.
+; The actual FileSysNode PipeLinks are created in build-memory.scm.in
+; with CMake-configured project paths. The rest of this pipeline
+; references only the NameNodes, which are resolved at runtime.
 
 ; ---------------------------------------------------------------
 ; Stage 2 — Log file binding.

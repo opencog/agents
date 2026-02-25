@@ -30,7 +30,10 @@
 ; Add additional (load ...) statements here as more components are created
 (load (string-append source-dir "/file-reader.scm"))
 
-; Override directory paths with actual project directories
+; Bind directory NameNodes to actual project paths via FileSysNode.
+; These are the only PipeLink definitions for "scm dir" and "notebook dir"
+; (file-reader.scm declares the pipeline but not the bindings).
+(use-modules (opencog sensory))
 (PipeLink (NameNode "scm dir")
 	(FileSysNode (string-append "file://" project-dir "/scm")))
 (PipeLink (NameNode "notebook dir")

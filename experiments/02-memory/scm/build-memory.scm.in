@@ -39,7 +39,8 @@
 (PipeLink (NameNode "notebook dir")
 	(FileSysNode (string-append "file://" project-dir "/notebook")))
 
-(load (string-append source-dir "/start.scm"))
+; Note: start.scm is a standalone runtime script (opens RocksDB, loads
+; atoms, triggers pipelines) -- it is NOT loaded during the build.
 
 ; Create RocksStorageNode and store everything
 (format #t "Storing to ~a~%" rdb-path)
